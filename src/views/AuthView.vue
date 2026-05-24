@@ -174,6 +174,6 @@ const handleRegister = async () => {
 
 <style scoped>
 .bg-hero {
-  background-image: url('@/assets/hero-login.png');
+  background-image: url('../assets/hero-login.png');
 }
 </style>
