@@ -7,7 +7,7 @@
 
       <div class="flex flex-col sm:flex-row gap-6 items-start">
         <div v-if="selectedEntity.image" class="flex-shrink-0 w-full sm:w-48">
-          <img :src="selectedEntity.image" :alt="selectedEntity.name"
+          <img :src="getImageUrl(selectedEntity.image)" :alt="selectedEntity.name"
             class="w-full h-auto object-cover rounded-lg shadow-lg" />
         </div>
         <div class="flex-grow">
@@ -152,6 +152,15 @@ const props = defineProps({
     default: false,
   },
 });
+
+const getImageUrl = (url) => {
+  if (!url) return null;
+  // If it's a Vercel Blob private URL, use our proxy
+  if (url.includes('blob.vercel-storage.com')) {
+    return `/api/blob-proxy?url=${encodeURIComponent(url)}`;
+  }
+  return url;
+};
 
 // Resolve a pluralização dinâmica do tipo de entidade ('personagem' -> 'personagens', 'npc' -> 'npcs', 'monstro' -> 'monstros')
 const pluralType = computed(() => {

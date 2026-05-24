@@ -90,9 +90,18 @@ const handleFileChange = async (event) => {
   }
 };
 
+const getImageUrl = (url) => {
+  if (!url) return null;
+  // If it's a Vercel Blob private URL, use our proxy
+  if (url.includes('blob.vercel-storage.com')) {
+    return `/api/blob-proxy?url=${encodeURIComponent(url)}`;
+  }
+  return url;
+};
+
 watch(() => props.currentImageUrl, (newVal) => {
   if (typeof newVal === 'string' && newVal) {
-    previewUrl.value = newVal;
+    previewUrl.value = getImageUrl(newVal);
     fileName.value = newVal.split('/').pop() || 'imagem_atual'; 
   } else if (!newVal) {
     previewUrl.value = null;
