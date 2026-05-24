@@ -5,9 +5,12 @@ export const usePersonagensStore = defineStore('personagens', {
     personagens: [],
     loading: false,
     error: null,
+    lastCampaignId: null
   }),
   actions: {
     async fetchPersonagens(campaignId) {
+      if (this.lastCampaignId === campaignId && this.personagens.length > 0) return;
+      
       this.loading = true;
       try {
         const url = campaignId ? `/api/entities?type=personagens&campaign_id=${campaignId}` : '/api/entities?type=personagens';
@@ -18,6 +21,7 @@ export const usePersonagensStore = defineStore('personagens', {
           throw new Error(`Failed to fetch personagens: ${response.status} - ${text}`);
         }
         this.personagens = await response.json();
+        this.lastCampaignId = campaignId;
       } catch (error) {
         this.error = error;
         console.error('Error fetching personagens:', error);
@@ -45,7 +49,8 @@ export const usePersonagensStore = defineStore('personagens', {
         
         if (!response.ok) throw new Error('Failed to add personagem');
         
-        // Refetch to get populated relations
+        // Invalidate cache to force refetch with full details
+        this.lastCampaignId = null;
         await this.fetchPersonagens(personagemData.campaign_id);
       } catch (error) {
         this.error = error;
@@ -73,6 +78,8 @@ export const usePersonagensStore = defineStore('personagens', {
 
         if (!response.ok) throw new Error('Failed to update personagem');
         
+        // Invalidate cache to force refetch with full details
+        this.lastCampaignId = null;
         await this.fetchPersonagens(personagemData.campaign_id);
       } catch (error) {
         this.error = error;

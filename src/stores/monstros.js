@@ -5,9 +5,12 @@ export const useMonstrosStore = defineStore('monstros', {
     monstros: [],
     loading: false,
     error: null,
+    lastCampaignId: null
   }),
   actions: {
     async fetchMonstros(campaignId) {
+      if (this.lastCampaignId === campaignId && this.monstros.length > 0) return;
+      
       this.loading = true;
       try {
         const url = campaignId ? `/api/entities?type=monstros&campaign_id=${campaignId}` : '/api/entities?type=monstros';
@@ -18,6 +21,7 @@ export const useMonstrosStore = defineStore('monstros', {
           throw new Error(`Failed to fetch monstros: ${response.status} - ${text}`);
         }
         this.monstros = await response.json();
+        this.lastCampaignId = campaignId;
       } catch (error) {
         this.error = error;
         console.error('Error fetching monstros:', error);
@@ -45,7 +49,8 @@ export const useMonstrosStore = defineStore('monstros', {
         
         if (!response.ok) throw new Error('Failed to add monstro');
         
-        // Refetch to get populated relations
+        // Invalidate cache to force refetch with full details
+        this.lastCampaignId = null;
         await this.fetchMonstros(monstroData.campaign_id);
       } catch (error) {
         this.error = error;
@@ -73,6 +78,8 @@ export const useMonstrosStore = defineStore('monstros', {
 
         if (!response.ok) throw new Error('Failed to update monstro');
         
+        // Invalidate cache to force refetch with full details
+        this.lastCampaignId = null;
         await this.fetchMonstros(monstroData.campaign_id);
       } catch (error) {
         this.error = error;

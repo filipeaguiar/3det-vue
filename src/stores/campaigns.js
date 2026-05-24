@@ -6,9 +6,11 @@ export const useCampaignsStore = defineStore('campaigns', {
     activeCampaign: null,
     loading: false,
     error: null,
+    fetched: false
   }),
   actions: {
     async fetchCampaigns() {
+      if (this.fetched) return;
       this.loading = true;
       this.error = null;
       try {
@@ -16,6 +18,7 @@ export const useCampaignsStore = defineStore('campaigns', {
         if (!response.ok) throw new Error('Failed to fetch campaigns');
         const data = await response.json();
         this.campaigns = data;
+        this.fetched = true;
         if (data.length > 0 && !this.activeCampaign) {
           this.setActiveCampaign(data[0]);
         }

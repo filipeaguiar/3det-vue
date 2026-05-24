@@ -5,9 +5,12 @@ export const useNpcsStore = defineStore('npcs', {
     npcs: [],
     loading: false,
     error: null,
+    lastCampaignId: null
   }),
   actions: {
     async fetchNpcs(campaignId) {
+      if (this.lastCampaignId === campaignId && this.npcs.length > 0) return;
+      
       this.loading = true;
       try {
         const url = campaignId ? `/api/entities?type=npcs&campaign_id=${campaignId}` : '/api/entities?type=npcs';
@@ -18,6 +21,7 @@ export const useNpcsStore = defineStore('npcs', {
           throw new Error(`Failed to fetch npcs: ${response.status} - ${text}`);
         }
         this.npcs = await response.json();
+        this.lastCampaignId = campaignId;
       } catch (error) {
         this.error = error;
         console.error('Error fetching npcs:', error);
@@ -45,7 +49,8 @@ export const useNpcsStore = defineStore('npcs', {
         
         if (!response.ok) throw new Error('Failed to add npc');
         
-        // Refetch to get populated relations
+        // Invalidate cache to force refetch with full details
+        this.lastCampaignId = null;
         await this.fetchNpcs(npcData.campaign_id);
       } catch (error) {
         this.error = error;
@@ -73,6 +78,8 @@ export const useNpcsStore = defineStore('npcs', {
 
         if (!response.ok) throw new Error('Failed to update npc');
         
+        // Invalidate cache to force refetch with full details
+        this.lastCampaignId = null;
         await this.fetchNpcs(npcData.campaign_id);
       } catch (error) {
         this.error = error;

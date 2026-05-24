@@ -6,9 +6,12 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
     latestChapter: null,
     loading: false,
     error: null,
+    lastCampaignId: null
   }),
   actions: {
     async fetchChapters(campaignId) {
+      if (this.lastCampaignId === campaignId && this.chapters.length > 0) return;
+      
       this.loading = true;
       this.error = null;
       try {
@@ -17,6 +20,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
         const data = await response.json();
         
         this.chapters = data;
+        this.lastCampaignId = campaignId;
         if (data.length > 0) {
           // Sort by chapter_number descending for the latest
           const sorted = [...data].sort((a, b) => b.chapter_number - a.chapter_number);
@@ -46,6 +50,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
         // Sort chapters by chapter_number descending
         this.chapters.sort((a, b) => b.chapter_number - a.chapter_number);
         this.latestChapter = this.chapters[0];
+        this.lastCampaignId = campaignId;
       } catch (error) {
         this.error = error.message;
       } finally {

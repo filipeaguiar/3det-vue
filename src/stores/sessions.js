@@ -6,9 +6,12 @@ export const useSessionsStore = defineStore('sessions', {
     activeSession: null,
     loading: false,
     error: null,
+    lastCampaignId: null
   }),
   actions: {
     async fetchSessions(campaignId) {
+      if (this.lastCampaignId === campaignId && this.sessions.length > 0) return;
+      
       this.loading = true;
       this.error = null;
       if (!campaignId) {
@@ -20,6 +23,7 @@ export const useSessionsStore = defineStore('sessions', {
         const response = await fetch(`/api/sessions?campaign_id=${campaignId}`);
         if (!response.ok) throw new Error('Failed to fetch sessions');
         this.sessions = await response.json();
+        this.lastCampaignId = campaignId;
       } catch (error) {
         this.error = error.message;
       } finally {
@@ -69,6 +73,8 @@ export const useSessionsStore = defineStore('sessions', {
         });
         if (!response.ok) throw new Error('Failed to create session');
         
+        // Invalidate cache to force refetch
+        this.lastCampaignId = null;
         await this.fetchLatestSessionWithDetails(sessionData.campaign_id);
       } catch (error) {
         this.error = error.message;
@@ -87,6 +93,8 @@ export const useSessionsStore = defineStore('sessions', {
         });
         if (!response.ok) throw new Error('Failed to update session');
         
+        // Invalidate cache to force refetch
+        this.lastCampaignId = null;
         await this.fetchLatestSessionWithDetails(sessionData.campaign_id);
       } catch (error) {
         this.error = error.message;
@@ -103,6 +111,8 @@ export const useSessionsStore = defineStore('sessions', {
         });
         if (!response.ok) throw new Error('Failed to delete session');
         
+        // Invalidate cache to force refetch
+        this.lastCampaignId = null;
         await this.fetchLatestSessionWithDetails(campaignId);
       } catch (error) {
         this.error = error.message;
