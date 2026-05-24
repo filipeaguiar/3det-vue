@@ -155,9 +155,9 @@ const props = defineProps({
 
 const getImageUrl = (url) => {
   if (!url) return null;
-  // If it's a Vercel Blob private URL, use our proxy
+  // If it's a Vercel Blob private URL, use our consolidated upload/proxy endpoint
   if (url.includes('blob.vercel-storage.com')) {
-    return `/api/blob-proxy?url=${encodeURIComponent(url)}`;
+    return `/api/upload?url=${encodeURIComponent(url)}`;
   }
   return url;
 };
