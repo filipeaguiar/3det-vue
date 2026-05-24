@@ -1,5 +1,7 @@
 import { put, get } from '@vercel/blob';
 import { getUserFromReq } from './_utils/auth.js';
+import { Readable } from 'stream';
+import { v4 as uuidv4 } from 'uuid';
 
 export const config = {
   api: {
@@ -32,8 +34,8 @@ export default async function handler(req, res) {
       res.setHeader('Content-Type', blob.contentType);
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
 
-      // Stream the content to the response
-      return stream.pipe(res);
+      // Convert Web Stream to Node Stream and pipe to response
+      return Readable.fromWeb(stream).pipe(res);
     } catch (error) {
       console.error('Proxy error:', error);
       return res.status(500).json({ error: 'Failed to fetch image', details: error.message });
