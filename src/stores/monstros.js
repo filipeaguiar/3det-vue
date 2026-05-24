@@ -10,7 +10,7 @@ export const useMonstrosStore = defineStore('monstros', {
     async fetchMonstros(campaignId) {
       this.loading = true;
       try {
-        const url = campaignId ? `/api/entities/monstros?campaign_id=${campaignId}` : '/api/entities/monstros';
+        const url = campaignId ? `/api/entities?type=monstros&campaign_id=${campaignId}` : '/api/entities?type=monstros';
         const response = await fetch(url);
         if (!response.ok) {
           const text = await response.text();
@@ -37,7 +37,7 @@ export const useMonstrosStore = defineStore('monstros', {
           tecnicas: (monstroData.tecnicas || []).map(v => v.tecnica_id || v.id).filter(id => id),
         };
 
-        const response = await fetch('/api/entities/monstros', {
+        const response = await fetch('/api/entities?type=monstros', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -65,7 +65,7 @@ export const useMonstrosStore = defineStore('monstros', {
           tecnicas: (monstroData.tecnicas || []).map(v => v.tecnica_id || v.id).filter(id => id),
         };
 
-        const response = await fetch(`/api/entities/monstros/${monstroData.id}`, {
+        const response = await fetch(`/api/entities?type=monstros&id=${monstroData.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -108,7 +108,7 @@ export const useMonstrosStore = defineStore('monstros', {
     async deleteMonstro(monstroId) {
       this.loading = true;
       try {
-        const response = await fetch(`/api/entities/monstros/${monstroId}`, {
+        const response = await fetch(`/api/entities?type=monstros&id=${monstroId}`, {
           method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete monstro');

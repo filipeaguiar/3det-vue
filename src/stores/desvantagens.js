@@ -10,7 +10,7 @@ export const useDesvantagensStore = defineStore('desvantagens', {
     async fetchDesvantagens() {
       this.loading = true;
       try {
-        const response = await fetch('/api/rules/desvantagens');
+        const response = await fetch('/api/entities?type=desvantagens');
         if (!response.ok) throw new Error('Failed to fetch desvantagens');
         this.desvantagens = await response.json();
       } catch (error) {

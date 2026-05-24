@@ -10,7 +10,7 @@ export const useVantagensStore = defineStore('vantagens', {
     async fetchVantagens() {
       this.loading = true;
       try {
-        const response = await fetch('/api/rules/vantagens');
+        const response = await fetch('/api/entities?type=vantagens');
         if (!response.ok) throw new Error('Failed to fetch vantagens');
         this.vantagens = await response.json();
       } catch (error) {

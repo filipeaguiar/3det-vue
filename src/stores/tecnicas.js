@@ -10,7 +10,7 @@ export const useTecnicasStore = defineStore('tecnicas', {
     async fetchTecnicas() {
       this.loading = true;
       try {
-        const response = await fetch('/api/rules/tecnicas');
+        const response = await fetch('/api/entities?type=tecnicas');
         if (!response.ok) throw new Error('Failed to fetch tecnicas');
         this.tecnicas = await response.json();
       } catch (error) {

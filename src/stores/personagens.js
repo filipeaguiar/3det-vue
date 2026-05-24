@@ -10,7 +10,7 @@ export const usePersonagensStore = defineStore('personagens', {
     async fetchPersonagens(campaignId) {
       this.loading = true;
       try {
-        const url = campaignId ? `/api/entities/personagens?campaign_id=${campaignId}` : '/api/entities/personagens';
+        const url = campaignId ? `/api/entities?type=personagens&campaign_id=${campaignId}` : '/api/entities?type=personagens';
         const response = await fetch(url);
         if (!response.ok) {
           const text = await response.text();
@@ -37,7 +37,7 @@ export const usePersonagensStore = defineStore('personagens', {
           tecnicas: (personagemData.tecnicas || []).map(v => v.tecnica_id || v.id).filter(id => id),
         };
 
-        const response = await fetch('/api/entities/personagens', {
+        const response = await fetch('/api/entities?type=personagens', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -65,7 +65,7 @@ export const usePersonagensStore = defineStore('personagens', {
           tecnicas: (personagemData.tecnicas || []).map(v => v.tecnica_id || v.id).filter(id => id),
         };
 
-        const response = await fetch(`/api/entities/personagens/${personagemData.id}`, {
+        const response = await fetch(`/api/entities?type=personagens&id=${personagemData.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -108,7 +108,7 @@ export const usePersonagensStore = defineStore('personagens', {
     async deletePersonagem(personagemId) {
       this.loading = true;
       try {
-        const response = await fetch(`/api/entities/personagens/${personagemId}`, {
+        const response = await fetch(`/api/entities?type=personagens&id=${personagemId}`, {
           method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete personagem');

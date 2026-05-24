@@ -10,7 +10,7 @@ export const useNpcsStore = defineStore('npcs', {
     async fetchNpcs(campaignId) {
       this.loading = true;
       try {
-        const url = campaignId ? `/api/entities/npcs?campaign_id=${campaignId}` : '/api/entities/npcs';
+        const url = campaignId ? `/api/entities?type=npcs&campaign_id=${campaignId}` : '/api/entities?type=npcs';
         const response = await fetch(url);
         if (!response.ok) {
           const text = await response.text();
@@ -37,7 +37,7 @@ export const useNpcsStore = defineStore('npcs', {
           tecnicas: (npcData.tecnicas || []).map(v => v.tecnica_id || v.id).filter(id => id),
         };
 
-        const response = await fetch('/api/entities/npcs', {
+        const response = await fetch('/api/entities?type=npcs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -65,7 +65,7 @@ export const useNpcsStore = defineStore('npcs', {
           tecnicas: (npcData.tecnicas || []).map(v => v.tecnica_id || v.id).filter(id => id),
         };
 
-        const response = await fetch(`/api/entities/npcs/${npcData.id}`, {
+        const response = await fetch(`/api/entities?type=npcs&id=${npcData.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -108,7 +108,7 @@ export const useNpcsStore = defineStore('npcs', {
     async deleteNpc(npcId) {
       this.loading = true;
       try {
-        const response = await fetch(`/api/entities/npcs/${npcId}`, {
+        const response = await fetch(`/api/entities?type=npcs&id=${npcId}`, {
           method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete npc');
