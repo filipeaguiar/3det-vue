@@ -358,20 +358,20 @@ watch(() => props.entity, (newEntity) => {
     let tecnicas = [];
 
     if (props.entityType === 'personagem') {
-      pericias = newEntity.personagens_pericias ? newEntity.personagens_pericias.map(p => ({ pericia_id: p.pericia_id, _tempId: uuidv4() })) : [];
-      vantagens = newEntity.personagens_vantagens ? newEntity.personagens_vantagens.map(v => ({ vantagem_id: v.vantagem_id, _tempId: uuidv4() })) : [];
-      desvantagens = newEntity.personagens_desvantagens ? newEntity.personagens_desvantagens.map(d => ({ desvantagem_id: d.desvantagem_id, _tempId: uuidv4() })) : [];
-      tecnicas = newEntity.personagens_tecnicas ? newEntity.personagens_tecnicas.map(t => ({ tecnica_id: t.tecnica_id, _tempId: uuidv4() })) : [];
+      pericias = newEntity.pericias ? newEntity.pericias.map(p => ({ pericia_id: p.id || p.pericia_id, _tempId: uuidv4() })) : (newEntity.personagens_pericias ? newEntity.personagens_pericias.map(p => ({ pericia_id: p.pericia_id, _tempId: uuidv4() })) : []);
+      vantagens = newEntity.vantagens ? newEntity.vantagens.map(v => ({ vantagem_id: v.id || v.vantagem_id, _tempId: uuidv4() })) : (newEntity.personagens_vantagens ? newEntity.personagens_vantagens.map(v => ({ vantagem_id: v.vantagem_id, _tempId: uuidv4() })) : []);
+      desvantagens = newEntity.desvantagens ? newEntity.desvantagens.map(d => ({ desvantagem_id: d.id || d.desvantagem_id, _tempId: uuidv4() })) : (newEntity.personagens_desvantagens ? newEntity.personagens_desvantagens.map(d => ({ desvantagem_id: d.desvantagem_id, _tempId: uuidv4() })) : []);
+      tecnicas = newEntity.tecnicas ? newEntity.tecnicas.map(t => ({ tecnica_id: t.id || t.tecnica_id, _tempId: uuidv4() })) : (newEntity.personagens_tecnicas ? newEntity.personagens_tecnicas.map(t => ({ tecnica_id: t.tecnica_id, _tempId: uuidv4() })) : []);
     } else if (props.entityType === 'npc') {
-      pericias = newEntity.npcs_pericias ? newEntity.npcs_pericias.map(p => ({ pericia_id: p.pericia_id, _tempId: uuidv4() })) : [];
-      vantagens = newEntity.npcs_vantagens ? newEntity.npcs_vantagens.map(v => ({ vantagem_id: v.vantagem_id, _tempId: uuidv4() })) : [];
-      desvantagens = newEntity.npcs_desvantagens ? newEntity.npcs_desvantagens.map(d => ({ desvantagem_id: d.desvantagem_id, _tempId: uuidv4() })) : [];
-      tecnicas = newEntity.npcs_tecnicas ? newEntity.npcs_tecnicas.map(t => ({ tecnica_id: t.tecnica_id, _tempId: uuidv4() })) : [];
+      pericias = newEntity.pericias ? newEntity.pericias.map(p => ({ pericia_id: p.id || p.pericia_id, _tempId: uuidv4() })) : (newEntity.npcs_pericias ? newEntity.npcs_pericias.map(p => ({ pericia_id: p.pericia_id, _tempId: uuidv4() })) : []);
+      vantagens = newEntity.vantagens ? newEntity.vantagens.map(v => ({ vantagem_id: v.id || v.vantagem_id, _tempId: uuidv4() })) : (newEntity.npcs_vantagens ? newEntity.npcs_vantagens.map(v => ({ vantagem_id: v.vantagem_id, _tempId: uuidv4() })) : []);
+      desvantagens = newEntity.desvantagens ? newEntity.desvantagens.map(d => ({ desvantagem_id: d.id || d.desvantagem_id, _tempId: uuidv4() })) : (newEntity.npcs_desvantagens ? newEntity.npcs_desvantagens.map(d => ({ desvantagem_id: d.desvantagem_id, _tempId: uuidv4() })) : []);
+      tecnicas = newEntity.tecnicas ? newEntity.tecnicas.map(t => ({ tecnica_id: t.id || t.tecnica_id, _tempId: uuidv4() })) : (newEntity.npcs_tecnicas ? newEntity.npcs_tecnicas.map(t => ({ tecnica_id: t.tecnica_id, _tempId: uuidv4() })) : []);
     } else if (props.entityType === 'monstro') {
-      pericias = newEntity.monstros_pericias ? newEntity.monstros_pericias.map(p => ({ pericia_id: p.pericia_id, _tempId: uuidv4() })) : [];
-      vantagens = newEntity.monstros_vantagens ? newEntity.monstros_vantagens.map(v => ({ vantagem_id: v.vantagem_id, _tempId: uuidv4() })) : [];
-      desvantagens = newEntity.monstros_desvantagens ? newEntity.monstros_desvantagens.map(d => ({ desvantagem_id: d.desvantagem_id, _tempId: uuidv4() })) : [];
-      tecnicas = newEntity.monstros_tecnicas ? newEntity.monstros_tecnicas.map(t => ({ tecnica_id: t.tecnica_id, _tempId: uuidv4() })) : [];
+      pericias = newEntity.pericias ? newEntity.pericias.map(p => ({ pericia_id: p.id || p.pericia_id, _tempId: uuidv4() })) : (newEntity.monstros_pericias ? newEntity.monstros_pericias.map(p => ({ pericia_id: p.pericia_id, _tempId: uuidv4() })) : []);
+      vantagens = newEntity.vantagens ? newEntity.vantagens.map(v => ({ vantagem_id: v.id || v.vantagem_id, _tempId: uuidv4() })) : (newEntity.monstros_vantagens ? newEntity.monstros_vantagens.map(v => ({ vantagem_id: v.vantagem_id, _tempId: uuidv4() })) : []);
+      desvantagens = newEntity.desvantagens ? newEntity.desvantagens.map(d => ({ desvantagem_id: d.id || d.desvantagem_id, _tempId: uuidv4() })) : (newEntity.monstros_desvantagens ? newEntity.monstros_desvantagens.map(d => ({ desvantagem_id: d.desvantagem_id, _tempId: uuidv4() })) : []);
+      tecnicas = newEntity.tecnicas ? newEntity.tecnicas.map(t => ({ tecnica_id: t.id || t.tecnica_id, _tempId: uuidv4() })) : (newEntity.monstros_tecnicas ? newEntity.monstros_tecnicas.map(t => ({ tecnica_id: t.tecnica_id, _tempId: uuidv4() })) : []);
     }
 
     formData.value = {

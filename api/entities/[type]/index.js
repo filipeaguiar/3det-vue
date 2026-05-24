@@ -28,11 +28,24 @@ export default async function handler(req, res) {
             const { rows } = await db.execute({ sql, args });
 
             // Fetch relations
+            const singular = type.slice(0, -1);
             for (let entity of rows) {
-                entity.vantagens = (await db.execute(`SELECT vantagem_id as id FROM ${type}_vantagens WHERE ${type.slice(0, -1)}_id = '${entity.id}'`)).rows.map(r => ({ id: r.id }));
-                entity.desvantagens = (await db.execute(`SELECT desvantagem_id as id FROM ${type}_desvantagens WHERE ${type.slice(0, -1)}_id = '${entity.id}'`)).rows.map(r => ({ id: r.id }));
-                entity.pericias = (await db.execute(`SELECT pericia_id as id FROM ${type}_pericias WHERE ${type.slice(0, -1)}_id = '${entity.id}'`)).rows.map(r => ({ id: r.id }));
-                entity.tecnicas = (await db.execute(`SELECT tecnica_id as id FROM ${type}_tecnicas WHERE ${type.slice(0, -1)}_id = '${entity.id}'`)).rows.map(r => ({ id: r.id }));
+                const vantagens = (await db.execute(`SELECT j.vantagem_id as id, r.name, r.cost, r.description FROM ${type}_vantagens j JOIN vantagens r ON j.vantagem_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
+                const desvantagens = (await db.execute(`SELECT j.desvantagem_id as id, r.name, r.cost, r.description FROM ${type}_desvantagens j JOIN desvantagens r ON j.desvantagem_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
+                const pericias = (await db.execute(`SELECT j.pericia_id as id, r.name, r.description FROM ${type}_pericias j JOIN pericias r ON j.pericia_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
+                const tecnicas = (await db.execute(`SELECT j.tecnica_id as id, r.name, r.cost, r.description, r.duration, r.requirements FROM ${type}_tecnicas j JOIN tecnicas r ON j.tecnica_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
+
+                // Set clean properties
+                entity.vantagens = vantagens;
+                entity.desvantagens = desvantagens;
+                entity.pericias = pericias;
+                entity.tecnicas = tecnicas;
+
+                // Set old compatibility properties for the frontend
+                entity[`${type}_vantagens`] = vantagens.map(v => ({ vantagem_id: v.id, vantagens: { name: v.name } }));
+                entity[`${type}_desvantagens`] = desvantagens.map(d => ({ desvantagem_id: d.id, desvantagens: { name: d.name } }));
+                entity[`${type}_pericias`] = pericias.map(p => ({ pericia_id: p.id, pericias: { name: p.name } }));
+                entity[`${type}_tecnicas`] = tecnicas.map(t => ({ tecnica_id: t.id, tecnicas: { name: t.name } }));
             }
 
             return res.status(200).json(rows);

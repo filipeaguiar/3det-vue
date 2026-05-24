@@ -72,9 +72,9 @@
           <div class="mb-4">
             <h4 class="font-bold mb-1 flex items-center gap-x-2 dark:text-slate-100"><i
                 class="fa-solid fa-graduation-cap fa-fw text-slate-500"></i><span>Perícias</span></h4>
-            <ul v-if="selectedEntity.personagens_pericias && selectedEntity.personagens_pericias.length > 0"
+            <ul v-if="periciasList.length > 0"
               class="list-disc list-inside ml-4 text-slate-600 dark:text-slate-400">
-              <li v-for="p in selectedEntity.personagens_pericias" :key="p.pericia_id">{{ p.pericias.name }}</li>
+              <li v-for="p in periciasList" :key="p.id">{{ p.name }}</li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhuma</p>
           </div>
@@ -83,9 +83,12 @@
           <div class="mb-4">
             <h4 class="font-bold mb-1 flex items-center gap-x-2 dark:text-slate-100"><i
                 class="fa-solid fa-thumbs-up fa-fw text-green-600"></i><span>Vantagens</span></h4>
-            <ul v-if="selectedEntity.personagens_vantagens && selectedEntity.personagens_vantagens.length > 0"
+            <ul v-if="vantagensList.length > 0"
               class="list-disc list-inside ml-4 text-slate-600 dark:text-slate-400">
-              <li v-for="v in selectedEntity.personagens_vantagens" :key="v.vantagem_id">{{ v.vantagens.name }}</li>
+              <li v-for="v in vantagensList" :key="v.id">
+                <span class="font-semibold">{{ v.name }}</span>
+                <span v-if="v.cost" class="text-xs text-slate-500 dark:text-slate-400 ml-1">({{ v.cost }})</span>
+              </li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhuma</p>
           </div>
@@ -94,9 +97,12 @@
           <div class="mb-4">
             <h4 class="font-bold mb-1 flex items-center gap-x-2 dark:text-slate-100"><i
                 class="fa-solid fa-thumbs-down fa-fw text-red-600"></i><span>Desvantagens</span></h4>
-            <ul v-if="selectedEntity.personagens_desvantagens && selectedEntity.personagens_desvantagens.length > 0"
+            <ul v-if="desvantagensList.length > 0"
               class="list-disc list-inside ml-4 text-slate-600 dark:text-slate-400">
-              <li v-for="d in selectedEntity.personagens_desvantagens" :key="d.desvantagem_id">{{ d.desvantagens.name }}</li>
+              <li v-for="d in desvantagensList" :key="d.id">
+                <span class="font-semibold">{{ d.name }}</span>
+                <span v-if="d.cost" class="text-xs text-slate-500 dark:text-slate-400 ml-1">({{ d.cost }})</span>
+              </li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhuma</p>
           </div>
@@ -105,9 +111,12 @@
           <div class="mb-4">
             <h4 class="font-bold mb-1 flex items-center gap-x-2 dark:text-slate-100"><i
                 class="fa-solid fa-hat-wizard fa-fw text-purple-600"></i><span>Técnicas</span></h4>
-            <ul v-if="selectedEntity.personagens_tecnicas && selectedEntity.personagens_tecnicas.length > 0"
+            <ul v-if="tecnicasList.length > 0"
               class="list-disc list-inside ml-4 text-slate-600 dark:text-slate-400">
-              <li v-for="t in selectedEntity.personagens_tecnicas" :key="t.tecnicas.name">{{ t.tecnicas.name }}</li>
+              <li v-for="t in tecnicasList" :key="t.id">
+                <span class="font-semibold">{{ t.name }}</span>
+                <span v-if="t.cost" class="text-xs text-slate-500 dark:text-slate-400 ml-1">({{ t.cost }})</span>
+              </li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhuma</p>
           </div>
@@ -123,7 +132,7 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, computed } from 'vue';
 
 const props = defineProps({
   selectedEntity: {
@@ -142,5 +151,75 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+});
+
+// Resolve a pluralização dinâmica do tipo de entidade ('personagem' -> 'personagens', 'npc' -> 'npcs', 'monstro' -> 'monstros')
+const pluralType = computed(() => {
+  if (props.entityType === 'personagem') return 'personagens';
+  if (props.entityType === 'npc') return 'npcs';
+  if (props.entityType === 'monstro') return 'monstros';
+  return props.entityType; // Caso já venha plural
+});
+
+const periciasList = computed(() => {
+  if (!props.selectedEntity) return [];
+  // Tenta o formato SQLite limpo e direto da API
+  if (props.selectedEntity.pericias && props.selectedEntity.pericias.length > 0) {
+    return props.selectedEntity.pericias;
+  }
+  // Fallback de retrocompatibilidade para o formato legado aninhado
+  const legacy = props.selectedEntity[`${pluralType.value}_pericias`];
+  if (legacy && legacy.length > 0) {
+    return legacy.map(p => ({
+      id: p.pericia_id,
+      name: p.pericias?.name || ''
+    }));
+  }
+  return [];
+});
+
+const vantagensList = computed(() => {
+  if (!props.selectedEntity) return [];
+  if (props.selectedEntity.vantagens && props.selectedEntity.vantagens.length > 0) {
+    return props.selectedEntity.vantagens;
+  }
+  const legacy = props.selectedEntity[`${pluralType.value}_vantagens`];
+  if (legacy && legacy.length > 0) {
+    return legacy.map(v => ({
+      id: v.vantagem_id,
+      name: v.vantagens?.name || ''
+    }));
+  }
+  return [];
+});
+
+const desvantagensList = computed(() => {
+  if (!props.selectedEntity) return [];
+  if (props.selectedEntity.desvantagens && props.selectedEntity.desvantagens.length > 0) {
+    return props.selectedEntity.desvantagens;
+  }
+  const legacy = props.selectedEntity[`${pluralType.value}_desvantagens`];
+  if (legacy && legacy.length > 0) {
+    return legacy.map(d => ({
+      id: d.desvantagem_id,
+      name: d.desvantagens?.name || ''
+    }));
+  }
+  return [];
+});
+
+const tecnicasList = computed(() => {
+  if (!props.selectedEntity) return [];
+  if (props.selectedEntity.tecnicas && props.selectedEntity.tecnicas.length > 0) {
+    return props.selectedEntity.tecnicas;
+  }
+  const legacy = props.selectedEntity[`${pluralType.value}_tecnicas`];
+  if (legacy && legacy.length > 0) {
+    return legacy.map(t => ({
+      id: t.tecnica_id,
+      name: t.tecnicas?.name || ''
+    }));
+  }
+  return [];
 });
 </script>
