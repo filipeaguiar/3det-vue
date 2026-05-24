@@ -12,7 +12,11 @@ export const useMonstrosStore = defineStore('monstros', {
       try {
         const url = campaignId ? `/api/entities/monstros?campaign_id=${campaignId}` : '/api/entities/monstros';
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to fetch monstros');
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`Failed to fetch monstros: ${response.status} - ${text}`);
+          throw new Error(`Failed to fetch monstros: ${response.status} - ${text}`);
+        }
         this.monstros = await response.json();
       } catch (error) {
         this.error = error;

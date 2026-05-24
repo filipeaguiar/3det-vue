@@ -12,7 +12,11 @@ export const usePersonagensStore = defineStore('personagens', {
       try {
         const url = campaignId ? `/api/entities/personagens?campaign_id=${campaignId}` : '/api/entities/personagens';
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to fetch personagens');
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`Failed to fetch personagens: ${response.status} - ${text}`);
+          throw new Error(`Failed to fetch personagens: ${response.status} - ${text}`);
+        }
         this.personagens = await response.json();
       } catch (error) {
         this.error = error;

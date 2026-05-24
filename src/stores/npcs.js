@@ -12,7 +12,11 @@ export const useNpcsStore = defineStore('npcs', {
       try {
         const url = campaignId ? `/api/entities/npcs?campaign_id=${campaignId}` : '/api/entities/npcs';
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to fetch npcs');
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`Failed to fetch npcs: ${response.status} - ${text}`);
+          throw new Error(`Failed to fetch npcs: ${response.status} - ${text}`);
+        }
         this.npcs = await response.json();
       } catch (error) {
         this.error = error;
