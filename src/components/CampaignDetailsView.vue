@@ -21,22 +21,34 @@
         
         <div v-if="chapterLoading" class="text-center text-slate-500 dark:text-slate-400">Carregando diário...</div>
         <div v-else-if="chapterError" class="text-center text-red-500">Erro ao carregar diário: {{ chapterError.message }}</div>
-        <div v-else-if="!latestChapter" class="text-center text-slate-500 dark:text-slate-400 flex-grow flex items-center justify-center">
+        <div v-else-if="chapters.length === 0" class="text-center text-slate-500 dark:text-slate-400 flex-grow flex items-center justify-center">
           <p>Nenhum capítulo encontrado para esta campanha.</p>
         </div>
-        <div v-else class="flex-grow overflow-y-auto">
-          <h5 class="font-semibold text-amber-600 dark:text-amber-400 mb-2">Capítulo {{ latestChapter.chapter_number }} - {{ formatDate(latestChapter.created_at) }}</h5>
-          <MarkdownRenderer :markdown="latestChapter.content" />
+        <div v-else class="flex-grow overflow-y-auto space-y-6 pr-2">
+          <div v-for="chapter in chapters" :key="chapter.id" class="border-b border-slate-200 dark:border-slate-700 pb-6 last:border-0">
+            <div class="flex justify-between items-center mb-3">
+              <h5 class="font-bold text-amber-600 dark:text-amber-400 text-lg">Capítulo {{ chapter.chapter_number }}</h5>
+              <div class="flex items-center gap-x-3">
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded">{{ formatDate(chapter.created_at) }}</span>
+                <button 
+                  @click="editChapter(chapter)" 
+                  class="text-slate-400 hover:text-amber-600 transition-colors p-1"
+                  title="Editar capítulo"
+                >
+                  <font-awesome-icon :icon="['fas', 'pen-to-square']" />
+                </button>
+              </div>
+            </div>
+            <div class="prose prose-slate dark:prose-invert max-w-none">
+              <MarkdownRenderer :markdown="chapter.content" />
+            </div>
+          </div>
         </div>
 
-        <div class="mt-4 flex justify-end gap-x-2">
-          <button @click="addChapter" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center gap-x-2">
+        <div class="mt-4 flex justify-end">
+          <button @click="addChapter" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-amber-500/20 transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-amber-500/20 flex items-center gap-x-2">
             <font-awesome-icon :icon="['fas', 'plus']" />
             <span>Novo Capítulo</span>
-          </button>
-          <button v-if="latestChapter" @click="editChapter(latestChapter)" class="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center gap-x-2">
-            <font-awesome-icon :icon="['fas', 'pen-to-square']" />
-            <span>Editar Último</span>
           </button>
         </div>
       </div>
@@ -72,7 +84,7 @@ const props = defineProps({
 const emit = defineEmits(['startEditing']);
 
 const campaignChaptersStore = useCampaignChaptersStore();
-const { latestChapter, loading: chapterLoading, error: chapterError } = storeToRefs(campaignChaptersStore);
+const { chapters, latestChapter, loading: chapterLoading, error: chapterError } = storeToRefs(campaignChaptersStore);
 
 const showChapterForm = ref(false);
 const chapterToEdit = ref(null);
