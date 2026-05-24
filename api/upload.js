@@ -20,14 +20,25 @@ export default async function handler(req, res) {
 
     const url = new URL(req.url, `http://${req.headers.host}`);
     const filename = url.searchParams.get('filename') || 'image-' + Date.now();
+    
+    console.log('Attempting upload for file:', filename);
+
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error('Missing BLOB_READ_WRITE_TOKEN environment variable');
+      return res.status(500).json({ error: 'Storage configuration missing' });
+    }
 
     const blob = await put(filename, req, {
       access: 'public',
     });
 
+    console.log('Upload successful:', blob.url);
     return res.status(200).json(blob);
   } catch (error) {
-    console.error('Upload error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Detailed upload error:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error', 
+      details: error.message 
+    });
   }
 }
