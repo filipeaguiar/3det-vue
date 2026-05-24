@@ -132,7 +132,7 @@ const authStore = useAuthStore();
 
 const handleLogin = async () => {
   try {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch('/api/auth?action=login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email.value, password: password.value })
@@ -153,7 +153,7 @@ const handleLogin = async () => {
 
 const handleRegister = async () => {
   try {
-    const response = await fetch('/api/auth/register', {
+    const response = await fetch('/api/auth?action=register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email.value, password: password.value })
