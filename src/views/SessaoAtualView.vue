@@ -1,23 +1,34 @@
 <template>
-  <section id="sessoes" class="h-full">
+  <section id="sessoes" class="h-full relative">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-      <EntityListView
-        :entities="sessionsStore.sessions"
-        :selectedEntity="sessionsStore.activeSession"
-        :loading="sessionsStore.loading"
-        :error="sessionsStore.error"
-        entityTitle="Sessões"
-        :entityIcon="['fas', 'scroll']"
-        :showCampaignFilter="true"
-        :campaigns="campaignsStore.campaigns"
-        :selectedCampaignId="campaignsStore.activeCampaign?.id"
-        @update:selectedCampaignId="campaignsStore.setActiveCampaign(campaignsStore.campaigns.find(c => c.id === $event))"
-        @selectEntity="selectSession"
-        @addEntity="addSession"
-        @deleteEntity="deleteSession"
-        @editEntity="editSession"
-        class="h-full overflow-y-auto"
-      />
+      <div class="flex flex-col gap-4">
+        <!-- AI Generator Trigger -->
+        <button 
+          @click="showAiModal = true"
+          class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-amber-500/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
+        >
+          <font-awesome-icon :icon="['fas', 'wand-magic-sparkles']" class="group-hover:rotate-12 transition-transform" />
+          <span>✨ Gerar com IA</span>
+        </button>
+
+        <EntityListView
+          :entities="sessionsStore.sessions"
+          :selectedEntity="sessionsStore.activeSession"
+          :loading="sessionsStore.loading"
+          :error="sessionsStore.error"
+          entityTitle="Sessões"
+          :entityIcon="['fas', 'scroll']"
+          :showCampaignFilter="true"
+          :campaigns="campaignsStore.campaigns"
+          :selectedCampaignId="campaignsStore.activeCampaign?.id"
+          @update:selectedCampaignId="campaignsStore.setActiveCampaign(campaignsStore.campaigns.find(c => c.id === $event))"
+          @selectEntity="selectSession"
+          @addEntity="addSession"
+          @deleteEntity="deleteSession"
+          @editEntity="editSession"
+          class="flex-grow overflow-y-auto"
+        />
+      </div>
 
       <div class="md:col-span-2 h-full">
         <SessionDetailsView
@@ -37,9 +48,16 @@
         />
       </div>
     </div>
+
+    <!-- AI Generator Modal -->
+    <AISessionGeneratorModal 
+      v-if="showAiModal"
+      @close="showAiModal = false"
+      @generated="handleAiGenerated"
+    />
   </section>
 
-  <div v-if="message" :class="{'bg-green-500': messageType === 'success', 'bg-red-500': messageType === 'error'}" class="text-white p-3 rounded-lg mt-4 text-center">
+  <div v-if="message" :class="{'bg-green-500': messageType === 'success', 'bg-red-500': messageType === 'error'}" class="fixed bottom-6 right-6 text-white p-4 rounded-2xl shadow-xl z-50 animate-bounce-in min-w-[300px] text-center font-bold">
     {{ message }}
   </div>
 </template>
@@ -52,6 +70,7 @@ import { useCampaignsStore } from '../stores/campaigns';
 import EntityListView from '../components/EntityListView.vue';
 import SessionDetailsView from '../components/SessionDetailsView.vue';
 import SessionForm from '../components/SessionForm.vue';
+import AISessionGeneratorModal from '../components/AISessionGeneratorModal.vue';
 
 const sessionsStore = useSessionsStore();
 const campaignsStore = useCampaignsStore();
@@ -62,6 +81,7 @@ const isEditMode = ref(false);
 const sessionToEdit = ref(null);
 const message = ref('');
 const messageType = ref('');
+const showAiModal = ref(false);
 
 const selectSession = (session) => {
   sessionsStore.activeSession = session;
@@ -76,6 +96,15 @@ const addSession = () => {
 const editSession = (session) => {
   sessionToEdit.value = { ...session }; // Clona a sessão para edição
   isEditMode.value = true;
+};
+
+const handleAiGenerated = (aiSession) => {
+  sessionToEdit.value = aiSession;
+  isEditMode.value = true;
+  showAiModal.value = false;
+  message.value = 'Rascunho gerado pela IA com sucesso!';
+  messageType.value = 'success';
+  setTimeout(() => { message.value = ''; }, 3000);
 };
 
 const deleteSession = async (id) => {
@@ -127,13 +156,9 @@ const loadInitialData = async (campaign) => {
   await sessionsStore.fetchSessions(campaign.id);
   await sessionsStore.fetchLatestSessionWithDetails(campaign.id);
   if (!sessionsStore.activeSession && sessionsStore.sessions.length > 0) {
-    // Se não houver uma sessão "mais recente" (talvez a primeira vez), seleciona a primeira da lista.
     sessionsStore.activeSession = sessionsStore.sessions[0];
   }
-  if (sessionsStore.sessions.length === 0) {
-    await nextTick();
-    addSession();
-  }
+  // Removemos o auto-addSession para não atrapalhar o fluxo da IA
 };
 
 watch(activeCampaign, (newCampaign) => {
@@ -150,5 +175,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Estilos para a scrollbar, se necessário */
+@keyframes bounce-in {
+  0% { transform: scale(0.9) translateY(20px); opacity: 0; }
+  70% { transform: scale(1.05) translateY(-5px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); }
+}
+.animate-bounce-in {
+  animation: bounce-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
 </style>

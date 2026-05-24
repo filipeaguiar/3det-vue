@@ -38,10 +38,27 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
+        // 1. Gerar resumo automático via IA
+        let summary = null;
+        try {
+          const aiRes = await fetch('/api/ai/summarize-chapter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: chapter.content })
+          });
+          if (aiRes.ok) {
+            const aiData = await aiRes.json();
+            summary = aiData.summary;
+          }
+        } catch (aiErr) {
+          console.error('Falha na auto-sumarização:', aiErr);
+        }
+
+        // 2. Salvar capítulo com o resumo
         const response = await fetch(`/api/campaigns?id=${campaignId}&action=chapters`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(chapter)
+            body: JSON.stringify({ ...chapter, summary })
         });
         if (!response.ok) throw new Error('Failed to create chapter');
         const data = await response.json();
@@ -61,10 +78,26 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
+        // 1. Gerar resumo automático se o conteúdo mudou (simplificado: gera sempre no update)
+        let summary = chapter.summary;
+        try {
+          const aiRes = await fetch('/api/ai/summarize-chapter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: chapter.content })
+          });
+          if (aiRes.ok) {
+            const aiData = await aiRes.json();
+            summary = aiData.summary;
+          }
+        } catch (aiErr) {
+          console.error('Falha na auto-sumarização:', aiErr);
+        }
+
         const response = await fetch(`/api/campaigns?id=${campaignId}&action=chapters&chapterId=${chapter.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(chapter)
+            body: JSON.stringify({ ...chapter, summary })
         });
         if (!response.ok) throw new Error('Failed to update chapter');
         const data = await response.json();

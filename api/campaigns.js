@@ -118,13 +118,13 @@ export default async function handler(req, res) {
 
         if (req.method === 'POST') {
             try {
-                const { chapter_number, content } = req.body;
+                const { chapter_number, content, summary } = req.body;
                 const newChapterId = uuidv4();
                 await db.execute({
-                    sql: 'INSERT INTO campaign_chapters (id, campaign_id, chapter_number, content) VALUES (?, ?, ?, ?)',
-                    args: [newChapterId, campaign_id, chapter_number, content || '']
+                    sql: 'INSERT INTO campaign_chapters (id, campaign_id, chapter_number, content, summary) VALUES (?, ?, ?, ?, ?)',
+                    args: [newChapterId, campaign_id, chapter_number, content || '', summary || null]
                 });
-                return res.status(201).json({ id: newChapterId, campaign_id, chapter_number, content });
+                return res.status(201).json({ id: newChapterId, campaign_id, chapter_number, content, summary });
             } catch (error) {
                 return res.status(500).json({ error: 'Internal server error' });
             }
@@ -132,13 +132,13 @@ export default async function handler(req, res) {
 
         if (req.method === 'PUT') {
             try {
-                const { id: bodyId, chapter_number, content } = req.body;
+                const { id: bodyId, chapter_number, content, summary } = req.body;
                 const targetId = chapterId || bodyId;
                 await db.execute({
-                    sql: 'UPDATE campaign_chapters SET chapter_number = ?, content = ? WHERE id = ? AND campaign_id = ?',
-                    args: [chapter_number, content, targetId, campaign_id]
+                    sql: 'UPDATE campaign_chapters SET chapter_number = ?, content = ?, summary = ? WHERE id = ? AND campaign_id = ?',
+                    args: [chapter_number, content, summary || null, targetId, campaign_id]
                 });
-                return res.status(200).json({ id: targetId, campaign_id, chapter_number, content });
+                return res.status(200).json({ id: targetId, campaign_id, chapter_number, content, summary });
             } catch (error) {
                 return res.status(500).json({ error: 'Internal server error' });
             }
