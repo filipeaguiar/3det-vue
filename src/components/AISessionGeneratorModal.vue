@@ -174,7 +174,7 @@ const sessionSchema = z.object({
 });
 
 const { object: partialObject, submit, isLoading } = useObject({
-  api: '/api/ai/generate-session',
+  api: '/api/ai?action=generate-session',
   schema: sessionSchema,
   onFinish: ({ object }) => {
     isGenerating.value = false;

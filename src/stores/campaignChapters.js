@@ -41,7 +41,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
         // 1. Gerar resumo automático via IA
         let summary = null;
         try {
-          const aiRes = await fetch('/api/ai/summarize-chapter', {
+          const aiRes = await fetch('/api/ai?action=summarize-chapter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: chapter.content })
@@ -81,7 +81,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
         // 1. Gerar resumo automático se o conteúdo mudou (simplificado: gera sempre no update)
         let summary = chapter.summary;
         try {
-          const aiRes = await fetch('/api/ai/summarize-chapter', {
+          const aiRes = await fetch('/api/ai?action=summarize-chapter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: chapter.content })
