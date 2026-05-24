@@ -2,11 +2,13 @@ import { google } from '@ai-sdk/google';
 import { streamObject, generateObject } from 'ai';
 import { z } from 'zod';
 import { db } from './_utils/db-edge.js';
-import { getUserFromReq } from './_utils/auth.js';
+import { jwtVerify } from 'jose';
 
 export const config = {
   runtime: 'edge',
 };
+
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 // Esquema para a Sessão
 const sessionSchema = z.object({
@@ -63,14 +65,9 @@ export default async function handler(req) {
   try {
     const token = req.headers.get('cookie')?.split('; ').find(c => c.startsWith('auth_token='))?.split('=')[1];
     if (!token) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    
-    // Auth logic in Edge is simplified as we cannot use the full util.
-    // For this demo, we assume token presence is enough.
-    // In a real app, you would use a JWT library compatible with Edge runtime.
-    // const user = await getUserFromReq(req);
-    // if (!user) {
-    //   return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    // }
+
+    const user = await jwtVerify(token, JWT_SECRET).then(v => v.payload).catch(() => null);
+    if (!user) return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401 });
 
     // --- AÇÃO: GENERATE SESSION ---
     if (action === 'generate-session') {
@@ -88,21 +85,24 @@ export default async function handler(req) {
         sql: 'SELECT name, villain_motives FROM npcs WHERE campaign_id = ? AND user_id = ? AND is_villain = 1',
         args: [campaignId, user.userId]
       });
-      const villainsContext = villainsResult.rows.map(v => `- ${v.name}: ${v.villain_motives || 'Motivações ocultas'}`).join('\n');
+      const villainsContext = villainsResult.rows.map(v => `- ${v.name}: ${v.villain_motives || 'Motivações ocultas'}`).join('
+');
 
       const chaptersResult = await db.execute({
         sql: 'SELECT chapter_number, summary, content FROM campaign_chapters WHERE campaign_id = ? ORDER BY chapter_number ASC',
         args: [campaignId]
       });
       const chapters = chaptersResult.rows;
-      const timeline = chapters.map(c => `Capítulo ${c.chapter_number}: ${c.summary || 'Sem resumo'}`).join('\n');
+      const timeline = chapters.map(c => `Capítulo ${c.chapter_number}: ${c.summary || 'Sem resumo'}`).join('
+');
       const lastChapterProse = chapters.length > 0 ? chapters[chapters.length - 1].content : 'Nenhum capítulo registrado ainda.';
 
       const charsResult = await db.execute({
         sql: 'SELECT name, concept, archetype FROM personagens WHERE campaign_id = ? OR campaign_id IS NULL AND user_id = ?',
         args: [campaignId, user.userId]
       });
-      const characters = charsResult.rows.map(c => `- ${c.name} (${c.concept}, ${c.archetype})`).join('\n');
+      const characters = charsResult.rows.map(c => `- ${c.name} (${c.concept}, ${c.archetype})`).join('
+');
 
       const systemPrompt = `Você é um Co-Mestre especialista no sistema de RPG 3DeT Victory. Sua tarefa é gerar uma sessão estruturada.
 CONTEXTO DA CAMPANHA: Nome: ${campaign.name}, Descrição: ${campaign.description}
