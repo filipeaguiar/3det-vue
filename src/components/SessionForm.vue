@@ -313,16 +313,17 @@ const formData = ref({
 });
 
 watch(() => props.session, (newSession) => {
-  if (newSession) {
+  if (newSession && Object.keys(newSession).length > 0) {
     formData.value = {
       ...newSession,
-      objetivos: newSession.objetivos || [],
-      ganchos_personagens: newSession.ganchos_personagens || [],
-      locais_interessantes: newSession.locais_interessantes || [],
-      npcs_importantes: newSession.npcs_importantes || [],
-      encontros_desafios: newSession.encontros_desafios || [],
-      segredos_rumores: newSession.segredos_rumores || [],
-      tesouros_recompensas: newSession.tesouros_recompensas || [],
+      // Garante que os arrays existam para evitar erros de renderização
+      objetivos: newSession.objetivos?.map(o => ({ ...o })) || [],
+      ganchos_personagens: newSession.ganchos_personagens?.map(g => ({ ...g })) || [],
+      locais_interessantes: newSession.locais_interessantes?.map(l => ({ ...l, caracteristicas: l.caracteristicas?.map(c => ({...c})) || [] })) || [],
+      npcs_importantes: newSession.npcs_importantes?.map(n => ({ ...n })) || [],
+      encontros_desafios: newSession.encontros_desafios?.map(e => ({ ...e })) || [],
+      segredos_rumores: newSession.segredos_rumores?.map(s => ({ ...s })) || [],
+      tesouros_recompensas: newSession.tesouros_recompensas?.map(t => ({ ...t })) || [],
     };
   } else {
     // Reset form for new session creation
@@ -340,7 +341,7 @@ watch(() => props.session, (newSession) => {
       tesouros_recompensas: [],
     };
   }
-}, { immediate: true });
+}, { immediate: true, deep: true });
 
 const addObjetivo = () => {
   formData.value.objetivos.push({ type: '', description: '' });
