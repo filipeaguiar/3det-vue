@@ -12,7 +12,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/campaigns/${campaignId}/chapters`);
+        const response = await fetch(`/api/campaigns?id=${campaignId}&action=chapters`);
         if (!response.ok) throw new Error('Failed to fetch chapters');
         const data = await response.json();
         
@@ -34,7 +34,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/campaigns/${campaignId}/chapters`, {
+        const response = await fetch(`/api/campaigns?id=${campaignId}&action=chapters`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(chapter)
@@ -56,7 +56,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/campaigns/${campaignId}/chapters/${chapter.id}`, {
+        const response = await fetch(`/api/campaigns?id=${campaignId}&action=chapters&chapterId=${chapter.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(chapter)
@@ -81,7 +81,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/campaigns/${campaignId}/chapters/${id}`, {
+        const response = await fetch(`/api/campaigns?id=${campaignId}&action=chapters&chapterId=${id}`, {
             method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete chapter');

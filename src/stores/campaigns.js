@@ -53,14 +53,14 @@ export const useCampaignsStore = defineStore('campaigns', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/campaigns/${campaign.id}`, {
+        const response = await fetch(`/api/campaigns?id=${campaign.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(campaign)
         });
         if (!response.ok) throw new Error('Failed to update campaign');
         
-        // Emulate optimistic update since PUT doesn't return full entity in our basic implementation
+        // Emulate optimistic update
         const index = this.campaigns.findIndex(c => c.id === campaign.id);
         if (index !== -1) {
           this.campaigns[index] = { ...this.campaigns[index], ...campaign };
@@ -78,8 +78,7 @@ export const useCampaignsStore = defineStore('campaigns', {
       this.loading = true;
       this.error = null;
       try {
-        // Backend handles cascade delete because PRAGMA foreign_keys = ON!
-        const response = await fetch(`/api/campaigns/${id}`, {
+        const response = await fetch(`/api/campaigns?id=${id}`, {
           method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete campaign');
