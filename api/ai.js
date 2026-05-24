@@ -100,7 +100,7 @@ DIRETIVAS: Ideia: ${userInput}, NPCs: ${selectedNpcs?.map(n => `${n.name} (${n.r
 Retorne APENAS o JSON conforme esquema.`;
 
       const result = await streamObject({
-        model: google('gemini-2.0-flash'),
+        model: google('gemini-2.5-flash-lite'),
         schema: sessionSchema,
         system: systemPrompt,
         prompt: `Gere a sessão: ${userInput}`,
@@ -115,7 +115,7 @@ Retorne APENAS o JSON conforme esquema.`;
       if (!content) return new Response(JSON.stringify({ error: 'Content required' }), { status: 400 });
 
       const { object } = await generateObject({
-        model: google('gemini-2.0-flash'),
+        model: google('gemini-2.5-flash-lite'),
         schema: summarySchema,
         system: `Você é um arquivista de RPG. Extraia um resumo técnico (Personagens, NPCs, Eventos). Máximo 250 caracteres.`,
         prompt: `Resuma: ${content}`,

@@ -18,8 +18,8 @@ O sistema de sessões atual é composto por uma entidade principal (`sessions`) 
 ## Decisions
 
 ### 1. Modelo de IA e Provedor
-Utilizaremos o modelo **Gemini 1.5 Flash** através do **Vercel AI SDK**.
-- **Racional**: O Gemini possui um tier gratuito excelente para desenvolvimento e uma janela de contexto ampla, permitindo enviar resumos de campanha sem estourar limites.
+Utilizaremos o modelo **Gemini 2.5 Flash-Lite** através do **Vercel AI SDK**.
+- **Racional**: O Gemini 2.5 Flash-Lite é um dos modelos mais modernos e rápidos do Google, com excelente disponibilidade no tier gratuito e ótima capacidade de geração estruturada.
 
 ### 2. Formato de Saída (Object Generation)
 Utilizaremos a função `generateObject` ou `streamObject` do Vercel AI SDK com um esquema Zod que espelha exatamente a estrutura do banco de dados/frontend.
