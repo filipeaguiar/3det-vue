@@ -95,9 +95,9 @@ const editChapter = (chapter) => {
 
 const handleSaveChapter = async (chapterData) => {
   if (chapterData.id) {
-    await campaignChaptersStore.updateChapter(chapterData);
+    await campaignChaptersStore.updateChapter(props.campaign.id, chapterData);
   } else {
-    await campaignChaptersStore.addChapter(chapterData);
+    await campaignChaptersStore.addChapter(props.campaign.id, chapterData);
   }
   showChapterForm.value = false;
   chapterToEdit.value = null;

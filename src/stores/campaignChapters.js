@@ -12,13 +12,15 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/chapters?campaign_id=${campaignId}`);
+        const response = await fetch(`/api/campaigns/${campaignId}/chapters`);
         if (!response.ok) throw new Error('Failed to fetch chapters');
         const data = await response.json();
         
         this.chapters = data;
         if (data.length > 0) {
-          this.latestChapter = data[0];
+          // Sort by chapter_number descending for the latest
+          const sorted = [...data].sort((a, b) => b.chapter_number - a.chapter_number);
+          this.latestChapter = sorted[0];
         } else {
           this.latestChapter = null;
         }
@@ -28,11 +30,11 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
         this.loading = false;
       }
     },
-    async addChapter(chapter) {
+    async addChapter(campaignId, chapter) {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch('/api/chapters', {
+        const response = await fetch(`/api/campaigns/${campaignId}/chapters`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(chapter)
@@ -50,11 +52,11 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
         this.loading = false;
       }
     },
-    async updateChapter(chapter) {
+    async updateChapter(campaignId, chapter) {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/chapters/${chapter.id}`, {
+        const response = await fetch(`/api/campaigns/${campaignId}/chapters/${chapter.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(chapter)
@@ -75,11 +77,11 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
         this.loading = false;
       }
     },
-    async deleteChapter(id) {
+    async deleteChapter(campaignId, id) {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/chapters/${id}`, {
+        const response = await fetch(`/api/campaigns/${campaignId}/chapters/${id}`, {
             method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete chapter');
