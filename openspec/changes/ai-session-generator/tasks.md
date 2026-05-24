@@ -8,9 +8,9 @@
 
 - [x] 2.1 Adicionar coluna `summary` na tabela `campaign_chapters` (executar SQL no Turso)
 - [x] 2.2 Atualizar `api/campaigns.js` para suportar o campo `summary`
-- [x] 2.3 Implementar rota `/api/ai/generate-session` (Vercel Edge Function)
+- [x] 2.3 Implementar rota `/api/ai` (Vercel Edge Function) consolidada
 - [x] 2.4 Implementar lógica de coleta de contexto (Usando os novos `summaries` do histórico)
-- [x] 2.5 Implementar lógica de auto-sumarização estruturada (ao salvar capítulo)
+- [x] 2.5 Implementar lógica de auto-sumarização estruturada e geração de sessão em uma única API
 - [x] 2.6 Definir esquema Zod para o objeto de sessão e System Prompt
 - [x] 2.7 Implementar streaming do objeto gerado usando `streamObject`
 
