@@ -44,3 +44,29 @@ São 12 tabelas para lidar com os relacionamentos N:M:
 4. **Integração do ImageUpload Quebrada**: Há um descasamento de props/eventos. `EntityForm.vue` espera `@image-uploaded` e passa `:currentImageUrl`, enquanto `ImageUpload.vue` usa o padrão v-model (`modelValue` / `@update:modelValue`). O upload de imagem muito provavelmente não funciona na edição.
 5. **Pattern de Edição (Delete & Reinsert)**: Ao atualizar Vantagens/Desvantagens/etc. em uma entidade, a store deleta todas as ligações e as insere novamente, **sem envolver isso numa transação do banco**. Isso pode gerar registros órfãos ou perdidos se houver falha de rede.
 6. **Poluição por Logs e Variáveis Naming**: Diversos `console.log` deixados em produção nas stores. Há também uma mistura perigosa de casing nas colunas do Supabase (ex: `Habilidade`, `Poder` em PascalCase vs `campaign_id` em snake_case).
+
+## Requisitos
+
+### Requisito: Enriquecimento de Dados das Junções de Entidades
+O backend SHALL realizar as junções SQL (`JOIN`) apropriadas para obter e retornar o nome, descrição e demais atributos de Perícias, Vantagens, Desvantagens e Técnicas associadas a cada ficha consultada (Personagens, NPCs e Monstros).
+
+#### Cenário: Consulta de Detalhes de Entidade
+- **WHEN** a API de busca de entidade (`GET /api/entities/[type]` ou `GET /api/entities/[type]/[id]`) é chamada
+- **THEN** o sistema realiza o `JOIN` das tabelas de junção com as tabelas de referência (`vantagens`, `desvantagens`, `pericias`, `tecnicas`)
+- **THEN** o sistema retorna uma resposta contendo arrays populados de objetos com o identificador (`id`), o nome (`name`) e a descrição (`description`) de cada relacionamento
+
+### Requisito: Retrocompatibilidade de Resposta da API de Fichas
+O backend SHALL injetar propriedades retrocompatíveis na resposta JSON da consulta para evitar quebras nos templates e componentes que dependem do formato legado.
+
+#### Cenário: Injeção de Propriedades Baseadas no Tipo
+- **WHEN** uma entidade do tipo `npcs` é consultada na API
+- **THEN** o JSON de retorno SHALL incluir o array populado sob as chaves limpas (`vantagens`, `desvantagens`, `pericias`, `tecnicas`)
+- **AND** SHALL também duplicar e formatar estes arrays sob as chaves específicas `npcs_vantagens`, `npcs_desvantagens`, `npcs_pericias` e `npcs_tecnicas` no padrão esperado `{ npc_id, vantagens: { name } }`
+
+### Requisito: Unificação da Exibição de Fichas
+O componente `EntityDetailsView.vue` SHALL exibir corretamente os relacionamentos da ficha independentemente de seu tipo (Personagem, NPC ou Monstro).
+
+#### Cenário: Visualização de Ficha de NPC ou Monstro
+- **WHEN** o usuário seleciona um NPC ou um Monstro para ver os detalhes
+- **THEN** o sistema lê os dados dinamicamente utilizando computed properties retrocompatíveis
+- **THEN** o sistema exibe corretamente todas as Perícias, Vantagens, Desvantagens e Técnicas associadas no painel de detalhes, em vez de mostrar "Nenhuma"
