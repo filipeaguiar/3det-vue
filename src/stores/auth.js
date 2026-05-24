@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', {
     async signOut() {
       this.loading = true;
       try {
-        await fetch('/api/auth/logout', { method: 'POST' });
+        await fetch('/api/auth/session', { method: 'DELETE' });
         this.user = null;
       } catch (error) {
         this.error = error;
