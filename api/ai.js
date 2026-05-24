@@ -85,24 +85,21 @@ export default async function handler(req) {
         sql: 'SELECT name, villain_motives FROM npcs WHERE campaign_id = ? AND user_id = ? AND is_villain = 1',
         args: [campaignId, user.userId]
       });
-      const villainsContext = villainsResult.rows.map(v => `- ${v.name}: ${v.villain_motives || 'Motivações ocultas'}`).join('
-');
+      const villainsContext = villainsResult.rows.map(v => `- ${v.name}: ${v.villain_motives || 'Motivações ocultas'}`).join('\\n');
 
       const chaptersResult = await db.execute({
         sql: 'SELECT chapter_number, summary, content FROM campaign_chapters WHERE campaign_id = ? ORDER BY chapter_number ASC',
         args: [campaignId]
       });
       const chapters = chaptersResult.rows;
-      const timeline = chapters.map(c => `Capítulo ${c.chapter_number}: ${c.summary || 'Sem resumo'}`).join('
-');
+      const timeline = chapters.map(c => `Capítulo ${c.chapter_number}: ${c.summary || 'Sem resumo'}`).join('\\n');
       const lastChapterProse = chapters.length > 0 ? chapters[chapters.length - 1].content : 'Nenhum capítulo registrado ainda.';
 
       const charsResult = await db.execute({
         sql: 'SELECT name, concept, archetype FROM personagens WHERE campaign_id = ? OR campaign_id IS NULL AND user_id = ?',
         args: [campaignId, user.userId]
       });
-      const characters = charsResult.rows.map(c => `- ${c.name} (${c.concept}, ${c.archetype})`).join('
-');
+      const characters = charsResult.rows.map(c => `- ${c.name} (${c.concept}, ${c.archetype})`).join('\\n');
 
       const systemPrompt = `Você é um Co-Mestre especialista no sistema de RPG 3DeT Victory. Sua tarefa é gerar uma sessão estruturada.
 CONTEXTO DA CAMPANHA: Nome: ${campaign.name}, Descrição: ${campaign.description}
