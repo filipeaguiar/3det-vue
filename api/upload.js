@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     // Pass the request directly to put
     const blob = await put(filename, req, {
-      access: 'private',
+      access: 'public',
       contentType: contentType, // Help Vercel Blob identify the file type
     });
 
