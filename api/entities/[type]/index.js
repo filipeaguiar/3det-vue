@@ -28,7 +28,7 @@ export default async function handler(req, res) {
             const { rows } = await db.execute({ sql, args });
 
             // Fetch relations
-            const singular = type.slice(0, -1);
+            const singular = type === 'personagens' ? 'personagem' : type.slice(0, -1);
             for (let entity of rows) {
                 const vantagens = (await db.execute(`SELECT j.vantagem_id as id, r.name, r.cost, r.description FROM ${type}_vantagens j JOIN vantagens r ON j.vantagem_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
                 const desvantagens = (await db.execute(`SELECT j.desvantagem_id as id, r.name, r.cost, r.description FROM ${type}_desvantagens j JOIN desvantagens r ON j.desvantagem_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
                 args: [id, data.name, data.archetype, data.concept, data.pontos, data.Habilidade, data.Poder, data.Resistencia, data.Pontos_Vida, data.Pontos_Acao, data.Pontos_Mana, data.image, data.campaign_id || null, user.userId]
             });
 
-            const singular = type.slice(0, -1);
+            const singular = type === 'personagens' ? 'personagem' : type.slice(0, -1);
             if (data.vantagens) data.vantagens.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_vantagens (${singular}_id, vantagem_id) VALUES (?, ?)`, args: [id, v.id || v] }));
             if (data.desvantagens) data.desvantagens.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_desvantagens (${singular}_id, desvantagem_id) VALUES (?, ?)`, args: [id, v.id || v] }));
             if (data.pericias) data.pericias.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_pericias (${singular}_id, pericia_id) VALUES (?, ?)`, args: [id, v.id || v] }));

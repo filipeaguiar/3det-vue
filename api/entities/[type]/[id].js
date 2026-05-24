@@ -30,7 +30,7 @@ export default async function handler(req, res) {
             const entity = rows[0];
 
             // Relations
-            const singular = type.slice(0, -1);
+            const singular = type === 'personagens' ? 'personagem' : type.slice(0, -1);
             const vantagens = (await db.execute(`SELECT j.vantagem_id as id, r.name, r.cost, r.description FROM ${type}_vantagens j JOIN vantagens r ON j.vantagem_id = r.id WHERE j.${singular}_id = '${id}'`)).rows;
             const desvantagens = (await db.execute(`SELECT j.desvantagem_id as id, r.name, r.cost, r.description FROM ${type}_desvantagens j JOIN desvantagens r ON j.desvantagem_id = r.id WHERE j.${singular}_id = '${id}'`)).rows;
             const pericias = (await db.execute(`SELECT j.pericia_id as id, r.name, r.description FROM ${type}_pericias j JOIN pericias r ON j.pericia_id = r.id WHERE j.${singular}_id = '${id}'`)).rows;
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     if (req.method === 'PUT') {
         try {
             const data = req.body;
-            const singular = type.slice(0, -1);
+            const singular = type === 'personagens' ? 'personagem' : type.slice(0, -1);
             
             const stmts = [];
             stmts.push({
