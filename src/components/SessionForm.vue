@@ -60,7 +60,7 @@
       <!-- Objetivos -->
       <div class="mt-6 p-4 border rounded-lg shadow-sm bg-slate-50 dark:bg-slate-700 border-gray-300 dark:border-slate-600">
         <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-x-2"><font-awesome-icon :icon="['fas', 'bullseye']" /><span>Objetivos</span></h3>
-        <div v-for="(objetivo, index) in formData.session_objetivos" :key="index" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
+        <div v-for="(objetivo, index) in formData.objetivos" :key="index" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
           <div class="relative">
             <label :for="`objetivo-type-${index}`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo:</label>
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
@@ -89,7 +89,7 @@
       <!-- Ganchos de Personagens -->
       <div class="mt-6 p-4 border rounded-lg shadow-sm bg-slate-50 dark:bg-slate-700 border-gray-300 dark:border-slate-600">
         <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-x-2"><font-awesome-icon :icon="['fas', 'user-tag']" /><span>Ganchos de Personagens</span></h3>
-        <div v-for="(gancho, index) in formData.session_ganchos_personagens" :key="index" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
+        <div v-for="(gancho, index) in formData.ganchos_personagens" :key="index" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
           <div class="relative">
             <label :for="`gancho-personagem-${index}`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome do Personagem:</label>
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
@@ -118,7 +118,7 @@
       <!-- Locais Interessantes -->
       <div class="mt-6 p-4 border rounded-lg shadow-sm bg-slate-50 dark:bg-slate-700 border-gray-300 dark:border-slate-600">
         <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-x-2"><font-awesome-icon :icon="['fas', 'map-marker-alt']" /><span>Locais Interessantes</span></h3>
-        <div v-for="(local, localIndex) in formData.session_locais_interessantes" :key="localIndex" class="mb-4 p-3 border rounded-lg bg-white dark:bg-slate-800">
+        <div v-for="(local, localIndex) in formData.locais_interessantes" :key="localIndex" class="mb-4 p-3 border rounded-lg bg-white dark:bg-slate-800">
           <div class="flex justify-between items-center mb-2 relative">
             <label :for="`local-name-${localIndex}`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome do Local:</label>
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
@@ -131,7 +131,7 @@
             </button>
           </div>
           <h4 class="text-md font-semibold mb-2 text-slate-700 dark:text-slate-200">Características:</h4>
-          <div v-for="(carac, caracIndex) in local.session_locais_caracteristicas" :key="caracIndex" class="flex gap-4 mb-2 items-end relative">
+          <div v-for="(carac, caracIndex) in local.caracteristicas" :key="caracIndex" class="flex gap-4 mb-2 items-end relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
               <font-awesome-icon :icon="['fas', 'info-circle']" class="text-gray-400" />
             </div>
@@ -155,7 +155,7 @@
       <!-- NPCs Importantes -->
       <div class="mt-6 p-4 border rounded-lg shadow-sm bg-slate-50 dark:bg-slate-700 border-gray-300 dark:border-slate-600">
         <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-x-2"><font-awesome-icon :icon="['fas', 'user-friends']" /><span>NPCs Importantes</span></h3>
-        <div v-for="(npc, index) in formData.session_npcs_importantes" :key="index" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
+        <div v-for="(npc, index) in formData.npcs_importantes" :key="index" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
           <div class="relative">
             <label :for="`npc-id-${index}`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">ID do NPC:</label>
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
@@ -177,7 +177,7 @@
       <!-- Encontros e Desafios -->
       <div class="mt-6 p-4 border rounded-lg shadow-sm bg-slate-50 dark:bg-slate-700 border-gray-300 dark:border-slate-600">
         <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-x-2"><font-awesome-icon :icon="['fas', 'dragon']" /><span>Encontros e Desafios</span></h3>
-        <div v-for="(encontro, index) in formData.session_encontros_desafios" :key="index" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
+        <div v-for="(encontro, index) in formData.encontros_desafios" :key="index" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
           <div class="relative">
             <label :for="`encontro-title-${index}`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Título:</label>
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
@@ -213,7 +213,7 @@
       <!-- Segredos e Rumores -->
       <div class="mt-6 p-4 border rounded-lg shadow-sm bg-slate-50 dark:bg-slate-700 border-gray-300 dark:border-slate-600">
         <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-x-2"><font-awesome-icon :icon="['fas', 'mask']" /><span>Segredos e Rumores</span></h3>
-        <div v-for="(segredo, index) in formData.session_segredos_rumores" :key="index" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
+        <div v-for="(segredo, index) in formData.segredos_rumores" :key="index" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
           <div class="relative">
             <label :for="`segredo-description-${index}`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição:</label>
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
@@ -235,7 +235,7 @@
       <!-- Tesouros e Recompensas -->
       <div class="mt-6 p-4 border rounded-lg shadow-sm bg-slate-50 dark:bg-slate-700 border-gray-300 dark:border-slate-600">
         <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-x-2"><font-awesome-icon :icon="['fas', 'coins']" /><span>Tesouros e Recompensas</span></h3>
-        <div v-for="(tesouro, index) in formData.session_tesouros_recompensas" :key="index" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
+        <div v-for="(tesouro, index) in formData.tesouros_recompensas" :key="index" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 items-end p-3 border rounded-lg bg-white dark:bg-slate-800">
           <div class="relative">
             <label :for="`tesouro-name-${index}`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome:</label>
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
@@ -303,26 +303,26 @@ const formData = ref({
   description: '',
   comeco_forte: '',
   gancho_proxima_aventura: '',
-  session_objetivos: [],
-  session_ganchos_personagens: [],
-  session_locais_interessantes: [],
-  session_npcs_importantes: [],
-  session_encontros_desafios: [],
-  session_segredos_rumores: [],
-  session_tesouros_recompensas: [],
+  objetivos: [],
+  ganchos_personagens: [],
+  locais_interessantes: [],
+  npcs_importantes: [],
+  encontros_desafios: [],
+  segredos_rumores: [],
+  tesouros_recompensas: [],
 });
 
 watch(() => props.session, (newSession) => {
   if (newSession) {
     formData.value = {
       ...newSession,
-      session_objetivos: newSession.session_objetivos || [],
-      session_ganchos_personagens: newSession.session_ganchos_personagens || [],
-      session_locais_interessantes: newSession.session_locais_interessantes || [],
-      session_npcs_importantes: newSession.session_npcs_importantes || [],
-      session_encontros_desafios: newSession.session_encontros_desafios || [],
-      session_segredos_rumores: newSession.session_segredos_rumores || [],
-      session_tesouros_recompensas: newSession.session_tesouros_recompensas || [],
+      objetivos: newSession.objetivos || [],
+      ganchos_personagens: newSession.ganchos_personagens || [],
+      locais_interessantes: newSession.locais_interessantes || [],
+      npcs_importantes: newSession.npcs_importantes || [],
+      encontros_desafios: newSession.encontros_desafios || [],
+      segredos_rumores: newSession.segredos_rumores || [],
+      tesouros_recompensas: newSession.tesouros_recompensas || [],
     };
   } else {
     // Reset form for new session creation
@@ -331,70 +331,70 @@ watch(() => props.session, (newSession) => {
       description: '',
       comeco_forte: '',
       gancho_proxima_aventura: '',
-      session_objetivos: [],
-      session_ganchos_personagens: [],
-      session_locais_interessantes: [],
-      session_npcs_importantes: [],
-      session_encontros_desafios: [],
-      session_segredos_rumores: [],
-      session_tesouros_recompensas: [],
+      objetivos: [],
+      ganchos_personagens: [],
+      locais_interessantes: [],
+      npcs_importantes: [],
+      encontros_desafios: [],
+      segredos_rumores: [],
+      tesouros_recompensas: [],
     };
   }
 }, { immediate: true });
 
 const addObjetivo = () => {
-  formData.value.session_objetivos.push({ type: '', description: '' });
+  formData.value.objetivos.push({ type: '', description: '' });
 };
 const removeObjetivo = (index) => {
-  formData.value.session_objetivos.splice(index, 1);
+  formData.value.objetivos.splice(index, 1);
 };
 
 const addGancho = () => {
-  formData.value.session_ganchos_personagens.push({ personagem_name: '', description: '' });
+  formData.value.ganchos_personagens.push({ personagem_name: '', description: '' });
 };
 const removeGancho = (index) => {
-  formData.value.session_ganchos_personagens.splice(index, 1);
+  formData.value.ganchos_personagens.splice(index, 1);
 };
 
 const addLocal = () => {
-  formData.value.session_locais_interessantes.push({ name: '', session_locais_caracteristicas: [] });
+  formData.value.locais_interessantes.push({ name: '', caracteristicas: [] });
 };
 const removeLocal = (index) => {
-  formData.value.session_locais_interessantes.splice(index, 1);
+  formData.value.locais_interessantes.splice(index, 1);
 };
 const addCaracteristica = (localIndex) => {
-  formData.value.session_locais_interessantes[localIndex].session_locais_caracteristicas.push({ description: '' });
+  formData.value.locais_interessantes[localIndex].caracteristicas.push({ description: '' });
 };
 const removeCaracteristica = (localIndex, caracIndex) => {
-  formData.value.session_locais_interessantes[localIndex].session_locais_caracteristicas.splice(caracIndex, 1);
+  formData.value.locais_interessantes[localIndex].caracteristicas.splice(caracIndex, 1);
 };
 
 const addNpc = () => {
-  formData.value.session_npcs_importantes.push({ npc_id: null });
+  formData.value.npcs_importantes.push({ npc_id: null });
 };
 const removeNpc = (index) => {
-  formData.value.session_npcs_importantes.splice(index, 1);
+  formData.value.npcs_importantes.splice(index, 1);
 };
 
 const addEncontro = () => {
-  formData.value.session_encontros_desafios.push({ title: '', description: '', mecanica: '' });
+  formData.value.encontros_desafios.push({ title: '', description: '', mecanica: '' });
 };
 const removeEncontro = (index) => {
-  formData.value.session_encontros_desafios.splice(index, 1);
+  formData.value.encontros_desafios.splice(index, 1);
 };
 
 const addSegredo = () => {
-  formData.value.session_segredos_rumores.push({ description: '' });
+  formData.value.segredos_rumores.push({ description: '' });
 };
 const removeSegredo = (index) => {
-  formData.value.session_segredos_rumores.splice(index, 1);
+  formData.value.segredos_rumores.splice(index, 1);
 };
 
 const addTesouro = () => {
-  formData.value.session_tesouros_recompensas.push({ name: '', description_mecanica: '' });
+  formData.value.tesouros_recompensas.push({ name: '', description_mecanica: '' });
 };
 const removeTesouro = (index) => {
-  formData.value.session_tesouros_recompensas.splice(index, 1);
+  formData.value.tesouros_recompensas.splice(index, 1);
 };
 
 const submitForm = () => {

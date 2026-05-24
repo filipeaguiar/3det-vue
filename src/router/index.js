@@ -91,7 +91,9 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  await authStore.fetchUser(); // Ensure user session is loaded
+  if (!authStore.hasFetchedSession) {
+    await authStore.fetchUser();
+  }
 
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const isAuthenticated = !!authStore.user;

@@ -1,0 +1,43 @@
+schema: spec-driven
+
+context: |
+  # 3DeT Victory — Escudo do Mestre Digital
+  
+  Aplicação web de gerenciamento de RPG para o sistema 3DeT Victory (RPG brasileiro).
+  Funciona como um "Escudo do Mestre Digital" — ferramenta para Game Masters planejarem
+  e gerenciarem campanhas, sessões, personagens, NPCs, monstros e combate.
+  
+  ## Tech Stack
+  - Frontend: Vue 3 (Composition API, <script setup>), Vite 7, Tailwind CSS 4
+  - State: Pinia 3
+  - Backend: Supabase (Auth, PostgreSQL, Storage)
+  - Routing: Vue Router 4
+  - Icons: Font Awesome 6
+  - Markdown: marked 16
+  - IDs: uuid 11
+  - Idioma: Português Brasileiro (toda a UI)
+  
+  ## Domínio
+  - Sistema de RPG: 3DeT Victory (3 Dados e Testes)
+  - 3 Atributos: Poder, Habilidade, Resistência (0-5)
+  - Stats derivados: PV (5 × Resistência), PM (5 × Habilidade), PA (1 × Poder)
+  - Mecânicas: Vantagens, Desvantagens, Perícias, Técnicas
+  - Testes: 1d6/2d6/3d6 + atributo vs dificuldade
+  
+  ## Convenções
+  - Componentes Vue em PascalCase
+  - Stores Pinia em camelCase
+  - Nomes de tabelas Supabase em snake_case
+  - Commits em português
+  - Sem testes automatizados (dívida técnica conhecida)
+
+rules:
+  proposal:
+    - Propostas devem ser em português brasileiro
+    - Incluir impacto em componentes existentes
+  tasks:
+    - Tarefas devem ter granularidade de 1-4 horas
+    - Agrupar por componente/domínio
+  spec:
+    - Specs devem documentar o estado atual E o estado desejado
+    - Incluir diagramas ASCII quando útil

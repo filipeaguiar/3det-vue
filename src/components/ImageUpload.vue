@@ -12,9 +12,10 @@
       <button
         type="button"
         @click="fileInput.click()"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        :disabled="isUploading"
+        class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
       >
-        Selecionar Imagem
+        {{ isUploading ? 'Enviando...' : 'Selecionar Imagem' }}
       </button>
       <span v-if="fileName" class="text-gray-400">{{ fileName }}</span>
       <span v-else class="text-gray-500">Nenhuma imagem selecionada</span>
@@ -30,45 +31,69 @@
 import { ref, watch } from 'vue';
 
 const props = defineProps({
-  modelValue: {
-    type: [String, File],
+  currentImageUrl: {
+    type: String,
     default: null,
   },
 });
 
-const emit = defineEmits(['update:modelValue', 'error']);
+const emit = defineEmits(['image-uploaded', 'error']);
 
 const fileInput = ref(null);
 const fileName = ref('');
 const previewUrl = ref(null);
 const error = ref(null);
+const isUploading = ref(false);
 
-const handleFileChange = (event) => {
+const handleFileChange = async (event) => {
   const file = event.target.files[0];
   if (file) {
     if (!file.type.startsWith('image/')) {
       error.value = 'Por favor, selecione um arquivo de imagem válido.';
       fileName.value = '';
       previewUrl.value = null;
-      emit('update:modelValue', null);
+      emit('image-uploaded', null);
       emit('error', error.value);
       return;
     }
+    
     error.value = null;
     fileName.value = file.name;
+    // Show local preview immediately
     previewUrl.value = URL.createObjectURL(file);
-    emit('update:modelValue', file);
+    
+    // Upload file
+    isUploading.value = true;
+    try {
+      const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: 'POST',
+        body: file,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Falha no upload');
+      }
+      
+      const data = await response.json();
+      emit('image-uploaded', data.url);
+    } catch (err) {
+      error.value = 'Erro ao fazer upload da imagem.';
+      console.error(err);
+      emit('error', error.value);
+    } finally {
+      isUploading.value = false;
+    }
   } else {
     fileName.value = '';
     previewUrl.value = null;
-    emit('update:modelValue', null);
+    emit('image-uploaded', null);
   }
 };
 
-watch(() => props.modelValue, (newVal) => {
+watch(() => props.currentImageUrl, (newVal) => {
   if (typeof newVal === 'string' && newVal) {
     previewUrl.value = newVal;
-    fileName.value = newVal.split('/').pop(); // Tenta extrair o nome do arquivo da URL
+    fileName.value = newVal.split('/').pop() || 'imagem_atual'; 
   } else if (!newVal) {
     previewUrl.value = null;
     fileName.value = '';

@@ -91,13 +91,23 @@ const deleteSession = async (id) => {
   }
 };
 
-const handleSessionUpdate = async () => {
-  isEditMode.value = false;
-  sessionToEdit.value = null;
-  // A store já atualiza a lista e a sessão ativa, então não precisamos de mais nada aqui.
-  message.value = 'Sessão salva com sucesso!';
-  messageType.value = 'success';
-  setTimeout(() => { message.value = ''; }, 3000);
+const handleSessionUpdate = async (sessionData) => {
+  try {
+    if (sessionData.id) {
+      await sessionsStore.updateSession(sessionData);
+    } else {
+      await sessionsStore.addSession(sessionData);
+    }
+    isEditMode.value = false;
+    sessionToEdit.value = null;
+    message.value = 'Sessão salva com sucesso!';
+    messageType.value = 'success';
+    setTimeout(() => { message.value = ''; }, 3000);
+  } catch (error) {
+    message.value = `Erro ao salvar sessão: ${error.message}`;
+    messageType.value = 'error';
+    setTimeout(() => { message.value = ''; }, 5000);
+  }
 };
 
 const cancelCreation = () => {

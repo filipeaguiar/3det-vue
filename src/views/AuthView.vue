@@ -106,8 +106,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import { supabase } from '../services/supabase';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
 
 const email = ref('');
 const password = ref('');
@@ -115,17 +115,23 @@ const isLogin = ref(true);
 const message = ref('');
 const messageType = ref('');
 const router = useRouter();
+const authStore = useAuthStore();
 
 const handleLogin = async () => {
   try {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: password.value,
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value, password: password.value })
     });
-    if (error) throw error;
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Erro no login');
+    
+    authStore.setUser(data.user);
     message.value = 'Login bem-sucedido!';
     messageType.value = 'success';
-    router.push('/'); // Redireciona para a página inicial após o login
+    router.push('/');
   } catch (error) {
     message.value = error.message;
     messageType.value = 'error';
@@ -134,14 +140,18 @@ const handleLogin = async () => {
 
 const handleRegister = async () => {
   try {
-    const { error } = await supabase.auth.signUp({
-      email: email.value,
-      password: password.value,
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value, password: password.value })
     });
-    if (error) throw error;
-    message.value = 'Registro bem-sucedido! Verifique seu email para confirmar.';
+    
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Erro no registro');
+    
+    message.value = 'Registro bem-sucedido! Agora você pode fazer login.';
     messageType.value = 'success';
-    isLogin.value = true; // Volta para a tela de login após o registro
+    isLogin.value = true;
   } catch (error) {
     message.value = error.message;
     messageType.value = 'error';

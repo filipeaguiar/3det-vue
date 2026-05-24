@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { supabase } from '../services/supabase';
 
 export const useCampaignChaptersStore = defineStore('campaignChapters', {
   state: () => ({
@@ -13,12 +12,10 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const { data, error } = await supabase
-          .from('campaign_chapters')
-          .select('*')
-          .eq('campaign_id', campaignId)
-          .order('chapter_number', { ascending: false });
-        if (error) throw error;
+        const response = await fetch(`/api/chapters?campaign_id=${campaignId}`);
+        if (!response.ok) throw new Error('Failed to fetch chapters');
+        const data = await response.json();
+        
         this.chapters = data;
         if (data.length > 0) {
           this.latestChapter = data[0];
@@ -35,13 +32,18 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const { data, error } = await supabase
-          .from('campaign_chapters')
-          .insert(chapter)
-          .select();
-        if (error) throw error;
-        this.chapters.unshift(data[0]);
-        this.latestChapter = data[0];
+        const response = await fetch('/api/chapters', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(chapter)
+        });
+        if (!response.ok) throw new Error('Failed to create chapter');
+        const data = await response.json();
+        
+        this.chapters.unshift(data);
+        // Sort chapters by chapter_number descending
+        this.chapters.sort((a, b) => b.chapter_number - a.chapter_number);
+        this.latestChapter = this.chapters[0];
       } catch (error) {
         this.error = error.message;
       } finally {
@@ -52,19 +54,21 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const { data, error } = await supabase
-          .from('campaign_chapters')
-          .update(chapter)
-          .eq('id', chapter.id)
-          .select();
-        if (error) throw error;
+        const response = await fetch(`/api/chapters/${chapter.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(chapter)
+        });
+        if (!response.ok) throw new Error('Failed to update chapter');
+        const data = await response.json();
+        
         const index = this.chapters.findIndex(c => c.id === chapter.id);
         if (index !== -1) {
-          this.chapters[index] = data[0];
+          this.chapters[index] = data;
         }
-        if (this.latestChapter && this.latestChapter.id === chapter.id) {
-          this.latestChapter = data[0];
-        }
+        // Sort chapters by chapter_number descending
+        this.chapters.sort((a, b) => b.chapter_number - a.chapter_number);
+        this.latestChapter = this.chapters[0];
       } catch (error) {
         this.error = error.message;
       } finally {
@@ -75,12 +79,13 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
       this.loading = true;
       this.error = null;
       try {
-        const { error } = await supabase.from('campaign_chapters').delete().eq('id', id);
-        if (error) throw error;
+        const response = await fetch(`/api/chapters/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete chapter');
+        
         this.chapters = this.chapters.filter(c => c.id !== id);
-        if (this.latestChapter && this.latestChapter.id === id) {
-          this.latestChapter = this.chapters.length > 0 ? this.chapters[0] : null;
-        }
+        this.latestChapter = this.chapters.length > 0 ? this.chapters[0] : null;
       } catch (error) {
         this.error = error.message;
       } finally {

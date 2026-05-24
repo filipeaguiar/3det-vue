@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { supabase } from '../services/supabase';
 
 export const useVantagensStore = defineStore('vantagens', {
   state: () => ({
@@ -11,11 +10,9 @@ export const useVantagensStore = defineStore('vantagens', {
     async fetchVantagens() {
       this.loading = true;
       try {
-        const { data, error } = await supabase
-          .from('vantagens')
-          .select('id, name, cost, description, requirements');
-        if (error) throw error;
-        this.vantagens = data;
+        const response = await fetch('/api/rules/vantagens');
+        if (!response.ok) throw new Error('Failed to fetch vantagens');
+        this.vantagens = await response.json();
       } catch (error) {
         this.error = error;
         console.error('Error fetching vantagens:', error);

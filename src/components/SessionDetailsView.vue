@@ -154,7 +154,6 @@
 <script setup>
 import { computed, watch, ref } from 'vue';
 import SessionForm from './SessionForm.vue';
-import { supabase } from '../services/supabase';
 
 const props = defineProps({
   selectedSession: {
@@ -177,117 +176,18 @@ const props = defineProps({
 
 const emit = defineEmits(['sessionUpdated', 'creationCancelled', 'startEditing']);
 
-const sessionGanchosPersonagens = ref([]);
-const sessionLocaisInteressantes = ref([]);
-const sessionNpcsImportantes = ref([]);
-const sessionObjetivos = ref([]);
-const sessionSegredosRumores = ref([]);
-const sessionTesourosRecompensas = ref([]);
-const sessionEncontrosDesafios = ref([]);
-
-const fetchSessionDetails = async (sessionId) => {
-  if (!sessionId) {
-    resetDetails();
-    return;
-  }
-  try {
-    // Ganchos de Personagens
-    const { data: ganchos, error: ganchosError } = await supabase
-      .from('session_ganchos_personagens')
-      .select('*')
-      .eq('session_id', sessionId);
-    if (ganchosError) throw ganchosError;
-    sessionGanchosPersonagens.value = ganchos;
-
-    // Locais Interessantes (com características aninhadas)
-    const { data: locais, error: locaisError } = await supabase
-      .from('session_locais_interessantes')
-      .select(`
-        *,
-        caracteristicas:session_locais_caracteristicas(*)
-      `)
-      .eq('session_id', sessionId);
-    if (locaisError) throw locaisError;
-    sessionLocaisInteressantes.value = locais;
-
-    // NPCs Importantes (com detalhes do NPC)
-    const { data: npcs, error: npcsError } = await supabase
-      .from('session_npcs_importantes')
-      .select(`
-        *,
-        npcs(name)
-      `)
-      .eq('session_id', sessionId);
-    if (npcsError) throw npcsError;
-    sessionNpcsImportantes.value = npcs.map(item => ({ ...item, name: item.npcs.name }));
-
-    // Objetivos
-    const { data: objetivos, error: objetivosError } = await supabase
-      .from('session_objetivos')
-      .select('*')
-      .eq('session_id', sessionId);
-    if (objetivosError) throw objetivosError;
-    sessionObjetivos.value = objetivos;
-
-    // Segredos e Rumores
-    const { data: segredos, error: segredosError } = await supabase
-      .from('session_segredos_rumores')
-      .select('*')
-      .eq('session_id', sessionId);
-    if (segredosError) throw segredosError;
-    sessionSegredosRumores.value = segredos;
-
-    // Tesouros e Recompensas
-    const { data: tesouros, error: tesourosError } = await supabase
-      .from('session_tesouros_recompensas')
-      .select('*')
-      .eq('session_id', sessionId);
-    if (tesourosError) throw tesourosError;
-    sessionTesourosRecompensas.value = tesouros;
-
-    // Encontros e Desafios
-    const { data: encontros, error: encontrosError } = await supabase
-      .from('session_encontros_desafios')
-      .select('*')
-      .eq('session_id', sessionId);
-    if (encontrosError) throw encontrosError;
-    sessionEncontrosDesafios.value = encontros;
-
-  } catch (error) {
-    console.error("Erro ao buscar detalhes da sessão:", error.message);
-    resetDetails();
-  }
-};
-
-const resetDetails = () => {
-  sessionGanchosPersonagens.value = [];
-  sessionLocaisInteressantes.value = [];
-  sessionNpcsImportantes.value = [];
-  sessionObjetivos.value = [];
-  sessionSegredosRumores.value = [];
-  sessionTesourosRecompensas.value = [];
-  sessionEncontrosDesafios.value = [];
-};
-
-watch(() => props.selectedSession, (newSession) => {
-  if (newSession && !props.isEditMode) {
-    fetchSessionDetails(newSession.id);
-  } else if (!newSession) {
-    resetDetails();
-  }
-}, { immediate: true });
+// Simply use computed properties bound to selectedSession since the store provides it deeply populated
+const sessionGanchosPersonagens = computed(() => props.selectedSession?.ganchos_personagens || props.selectedSession?.session_ganchos_personagens || []);
+const sessionLocaisInteressantes = computed(() => props.selectedSession?.locais_interessantes || props.selectedSession?.session_locais_interessantes || []);
+const sessionNpcsImportantes = computed(() => props.selectedSession?.npcs_importantes || props.selectedSession?.session_npcs_importantes || []);
+const sessionObjetivos = computed(() => props.selectedSession?.objetivos || props.selectedSession?.session_objetivos || []);
+const sessionSegredosRumores = computed(() => props.selectedSession?.segredos_rumores || props.selectedSession?.session_segredos_rumores || []);
+const sessionTesourosRecompensas = computed(() => props.selectedSession?.tesouros_recompensas || props.selectedSession?.session_tesouros_recompensas || []);
+const sessionEncontrosDesafios = computed(() => props.selectedSession?.encontros_desafios || props.selectedSession?.session_encontros_desafios || []);
 
 const saveSession = async (sessionData) => {
-  try {
-    if (sessionData.id) {
-      await supabase.from('sessions').update(sessionData).eq('id', sessionData.id);
-    } else {
-      await supabase.from('sessions').insert(sessionData);
-    }
-    emit('sessionUpdated');
-  } catch (error) {
-    console.error("Erro ao salvar sessão:", error.message);
-  }
+  // Let parent (view) handle it through the store
+  emit('sessionUpdated', sessionData);
 };
 
 const cancelForm = () => {

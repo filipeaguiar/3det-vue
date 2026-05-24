@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { supabase } from '../services/supabase';
 
 export const useSessionsStore = defineStore('sessions', {
   state: () => ({
@@ -18,13 +17,9 @@ export const useSessionsStore = defineStore('sessions', {
         return;
       }
       try {
-        const { data, error } = await supabase
-          .from('sessions')
-          .select('*')
-          .eq('campaign_id', campaignId)
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        this.sessions = data;
+        const response = await fetch(`/api/sessions?campaign_id=${campaignId}`);
+        if (!response.ok) throw new Error('Failed to fetch sessions');
+        this.sessions = await response.json();
       } catch (error) {
         this.error = error.message;
       } finally {
@@ -40,32 +35,21 @@ export const useSessionsStore = defineStore('sessions', {
         return;
       }
       try {
-        const { data, error } = await supabase
-          .from('sessions')
-          .select(`
-            *,
-            session_encontros_desafios(*),
-            session_ganchos_personagens(*),
-            session_locais_interessantes(*, session_locais_caracteristicas(*)),
-            session_npcs_importantes(*, npcs(id, name, concept, image)),
-            session_objetivos(*),
-            session_segredos_rumores(*),
-            session_tesouros_recompensas(*)
-          `)
-          .eq('campaign_id', campaignId)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (error) {
-          if (error.code === 'PGRST116') { // "single()" row not found
-            console.log('Nenhuma sessão encontrada para esta campanha.');
-            this.activeSession = null;
-          } else {
-            throw error;
+        // Find latest session from the basic fetch
+        await this.fetchSessions(campaignId);
+        if (this.sessions.length > 0) {
+          const latestId = this.sessions[0].id;
+          const response = await fetch(`/api/sessions/${latestId}`);
+          if (!response.ok) {
+              if(response.status === 404) {
+                 this.activeSession = null;
+                 return;
+              }
+              throw new Error('Failed to fetch session details');
           }
+          this.activeSession = await response.json();
         } else {
-          this.activeSession = data;
+          this.activeSession = null;
         }
       } catch (err) {
         this.error = err.message;
@@ -78,58 +62,14 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true;
       this.error = null;
       try {
-        // 1. Insert main session data
-        const { title, description, comeco_forte, gancho_proxima_aventura, campaign_id } = sessionData;
-        const { data: newSession, error: sessionError } = await supabase
-          .from('sessions')
-          .insert({ title, description, comeco_forte, gancho_proxima_aventura, campaign_id })
-          .select()
-          .single();
-
-        if (sessionError) throw sessionError;
-
-        // 2. Insert related data
-        const sessionId = newSession.id;
-
-        const insertPromises = [];
-
-        if (sessionData.session_objetivos && sessionData.session_objetivos.length > 0) {
-          insertPromises.push(supabase.from('session_objetivos').insert(sessionData.session_objetivos.map(obj => ({ ...obj, session_id: sessionId }))));
-        }
-        if (sessionData.session_ganchos_personagens && sessionData.session_ganchos_personagens.length > 0) {
-          insertPromises.push(supabase.from('session_ganchos_personagens').insert(sessionData.session_ganchos_personagens.map(gancho => ({ ...gancho, session_id: sessionId }))));
-        }
-        if (sessionData.session_locais_interessantes && sessionData.session_locais_interessantes.length > 0) {
-          for (const local of sessionData.session_locais_interessantes) {
-            const { data: newLocal, error: localError } = await supabase
-              .from('session_locais_interessantes')
-              .insert({ name: local.name, session_id: sessionId })
-              .select()
-              .single();
-            if (localError) throw localError;
-
-            if (local.session_locais_caracteristicas && local.session_locais_caracteristicas.length > 0) {
-              insertPromises.push(supabase.from('session_locais_caracteristicas').insert(local.session_locais_caracteristicas.map(carac => ({ ...carac, local_id: newLocal.id }))));
-            }
-          }
-        }
-        if (sessionData.session_npcs_importantes && sessionData.session_npcs_importantes.length > 0) {
-          insertPromises.push(supabase.from('session_npcs_importantes').insert(sessionData.session_npcs_importantes.map(npc => ({ ...npc, session_id: sessionId }))));
-        }
-        if (sessionData.session_encontros_desafios && sessionData.session_encontros_desafios.length > 0) {
-          insertPromises.push(supabase.from('session_encontros_desafios').insert(sessionData.session_encontros_desafios.map(encontro => ({ ...encontro, session_id: sessionId }))));
-        }
-        if (sessionData.session_segredos_rumores && sessionData.session_segredos_rumores.length > 0) {
-          insertPromises.push(supabase.from('session_segredos_rumores').insert(sessionData.session_segredos_rumores.map(segredo => ({ ...segredo, session_id: sessionId }))));
-        }
-        if (sessionData.session_tesouros_recompensas && sessionData.session_tesouros_recompensas.length > 0) {
-          insertPromises.push(supabase.from('session_tesouros_recompensas').insert(sessionData.session_tesouros_recompensas.map(tesouro => ({ ...tesouro, session_id: sessionId }))));
-        }
-
-        await Promise.all(insertPromises);
-
-        this.sessions.unshift(newSession);
-        await this.fetchLatestSessionWithDetails(campaign_id);
+        const response = await fetch('/api/sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sessionData)
+        });
+        if (!response.ok) throw new Error('Failed to create session');
+        
+        await this.fetchLatestSessionWithDetails(sessionData.campaign_id);
       } catch (error) {
         this.error = error.message;
       } finally {
@@ -140,76 +80,14 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true;
       this.error = null;
       try {
-        const { id, title, description, comeco_forte, gancho_proxima_aventura, campaign_id } = sessionData;
-
-        // 1. Update main session data
-        const { data: updatedSession, error: sessionError } = await supabase
-          .from('sessions')
-          .update({ title, description, comeco_forte, gancho_proxima_aventura })
-          .eq('id', id)
-          .select()
-          .single();
-
-        if (sessionError) throw sessionError;
-
-        // 2. Delete existing related data
-        const deletePromises = [
-          supabase.from('session_objetivos').delete().eq('session_id', id),
-          supabase.from('session_ganchos_personagens').delete().eq('session_id', id),
-          supabase.from('session_locais_interessantes').delete().eq('session_id', id), // This will cascade delete caracteristicas
-          supabase.from('session_npcs_importantes').delete().eq('session_id', id),
-          supabase.from('session_encontros_desafios').delete().eq('session_id', id),
-          supabase.from('session_segredos_rumores').delete().eq('session_id', id),
-          supabase.from('session_tesouros_recompensas').delete().eq('session_id', id),
-        ];
-        await Promise.all(deletePromises);
-
-        // 3. Insert new related data
-        const insertPromises = [];
-
-        if (sessionData.session_objetivos && sessionData.session_objetivos.length > 0) {
-          insertPromises.push(supabase.from('session_objetivos').insert(sessionData.session_objetivos.map(obj => ({ ...obj, session_id: id }))));
-        }
-        if (sessionData.session_ganchos_personagens && sessionData.session_ganchos_personagens.length > 0) {
-          insertPromises.push(supabase.from('session_ganchos_personagens').insert(sessionData.session_ganchos_personagens.map(gancho => ({ ...gancho, session_id: id }))));
-        }
-        if (sessionData.session_locais_interessantes && sessionData.session_locais_interessantes.length > 0) {
-          for (const local of sessionData.session_locais_interessantes) {
-            const { data: newLocal, error: localError } = await supabase
-              .from('session_locais_interessantes')
-              .insert({ name: local.name, session_id: id })
-              .select()
-              .single();
-            if (localError) throw localError;
-
-            if (local.session_locais_caracteristicas && local.session_locais_caracteristicas.length > 0) {
-              insertPromises.push(supabase.from('session_locais_caracteristicas').insert(local.session_locais_caracteristicas.map(carac => ({ ...carac, local_id: newLocal.id }))));
-            }
-          }
-        }
-        if (sessionData.session_npcs_importantes && sessionData.session_npcs_importantes.length > 0) {
-          insertPromises.push(supabase.from('session_npcs_importantes').insert(sessionData.session_npcs_importantes.map(npc => ({ ...npc, session_id: id }))));
-        }
-        if (sessionData.session_encontros_desafios && sessionData.session_encontros_desafios.length > 0) {
-          insertPromises.push(supabase.from('session_encontros_desafios').insert(sessionData.session_encontros_desafios.map(encontro => ({ ...encontro, session_id: id }))));
-        }
-        if (sessionData.session_segredos_rumores && sessionData.session_segredos_rumores.length > 0) {
-          insertPromises.push(supabase.from('session_segredos_rumores').insert(sessionData.session_segredos_rumores.map(segredo => ({ ...segredo, session_id: id }))));
-        }
-        if (sessionData.session_tesouros_recompensas && sessionData.session_tesouros_recompensas.length > 0) {
-          insertPromises.push(supabase.from('session_tesouros_recompensas').insert(sessionData.session_tesouros_recompensas.map(tesouro => ({ ...tesouro, session_id: id }))));
-        }
-
-        await Promise.all(insertPromises);
-
-        // Update the local store state
-        const index = this.sessions.findIndex(s => s.id === id);
-        if (index !== -1) {
-          this.sessions[index] = updatedSession;
-        }
-        if (this.activeSession && this.activeSession.id === id) {
-          await this.fetchLatestSessionWithDetails(campaign_id);
-        }
+        const response = await fetch(`/api/sessions/${sessionData.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sessionData)
+        });
+        if (!response.ok) throw new Error('Failed to update session');
+        
+        await this.fetchLatestSessionWithDetails(sessionData.campaign_id);
       } catch (error) {
         this.error = error.message;
       } finally {
@@ -220,12 +98,12 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true;
       this.error = null;
       try {
-        const { error } = await supabase.from('sessions').delete().eq('id', id);
-        if (error) throw error;
-        this.sessions = this.sessions.filter(s => s.id !== id);
-        if (this.activeSession && this.activeSession.id === id) {
-          await this.fetchLatestSessionWithDetails(campaignId);
-        }
+        const response = await fetch(`/api/sessions/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete session');
+        
+        await this.fetchLatestSessionWithDetails(campaignId);
       } catch (error) {
         this.error = error.message;
       } finally {

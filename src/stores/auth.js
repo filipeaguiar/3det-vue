@@ -1,27 +1,20 @@
 import { defineStore } from 'pinia';
-import { supabase } from '../services/supabase';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
-    session: null,
     loading: false,
     error: null,
+    hasFetchedSession: false
   }),
   actions: {
-    setSession(session) {
-      this.session = session;
-      this.user = session?.user || null;
-    },
     setUser(user) {
       this.user = user;
     },
     async signOut() {
       this.loading = true;
       try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        this.session = null;
+        await fetch('/api/auth/logout', { method: 'POST' });
         this.user = null;
       } catch (error) {
         this.error = error;
@@ -31,14 +24,22 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async fetchUser() {
+      if (this.hasFetchedSession) return;
+      
       this.loading = true;
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        this.setSession(session);
+        const response = await fetch('/api/auth/session');
+        if (response.ok) {
+          const data = await response.json();
+          this.user = data.user;
+        } else {
+          this.user = null;
+        }
+        this.hasFetchedSession = true;
       } catch (error) {
         this.error = error;
         console.error('Error fetching user session:', error);
+        this.user = null;
       } finally {
         this.loading = false;
       }

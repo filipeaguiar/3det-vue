@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { supabase } from '../services/supabase';
 
 export const useCampaignsStore = defineStore('campaigns', {
   state: () => ({
@@ -9,17 +8,13 @@ export const useCampaignsStore = defineStore('campaigns', {
     error: null,
   }),
   actions: {
-    async fetchCampaigns(userId) {
-      if (!userId) return;
+    async fetchCampaigns() {
       this.loading = true;
       this.error = null;
       try {
-        const { data, error } = await supabase
-          .from('campaigns')
-          .select('*')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
-        if (error) throw error;
+        const response = await fetch('/api/campaigns');
+        if (!response.ok) throw new Error('Failed to fetch campaigns');
+        const data = await response.json();
         this.campaigns = data;
         if (data.length > 0 && !this.activeCampaign) {
           this.setActiveCampaign(data[0]);
@@ -37,14 +32,16 @@ export const useCampaignsStore = defineStore('campaigns', {
       this.loading = true;
       this.error = null;
       try {
-        const { data, error } = await supabase
-          .from('campaigns')
-          .insert(campaign)
-          .select();
-        if (error) throw error;
-        this.campaigns.unshift(data[0]);
+        const response = await fetch('/api/campaigns', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(campaign)
+        });
+        if (!response.ok) throw new Error('Failed to add campaign');
+        const data = await response.json();
+        this.campaigns.unshift(data);
         if (!this.activeCampaign) {
-          this.setActiveCampaign(data[0]);
+          this.setActiveCampaign(data);
         }
       } catch (error) {
         this.error = error.message;
@@ -56,18 +53,20 @@ export const useCampaignsStore = defineStore('campaigns', {
       this.loading = true;
       this.error = null;
       try {
-        const { data, error } = await supabase
-          .from('campaigns')
-          .update(campaign)
-          .eq('id', campaign.id)
-          .select();
-        if (error) throw error;
+        const response = await fetch(`/api/campaigns/${campaign.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(campaign)
+        });
+        if (!response.ok) throw new Error('Failed to update campaign');
+        
+        // Emulate optimistic update since PUT doesn't return full entity in our basic implementation
         const index = this.campaigns.findIndex(c => c.id === campaign.id);
         if (index !== -1) {
-          this.campaigns[index] = data[0];
+          this.campaigns[index] = { ...this.campaigns[index], ...campaign };
         }
         if (this.activeCampaign && this.activeCampaign.id === campaign.id) {
-          this.setActiveCampaign(data[0]);
+          this.setActiveCampaign(this.campaigns[index]);
         }
       } catch (error) {
         this.error = error.message;
@@ -79,11 +78,12 @@ export const useCampaignsStore = defineStore('campaigns', {
       this.loading = true;
       this.error = null;
       try {
-        await supabase.from('npcs').delete().eq('campaign_id', id);
-        await supabase.from('personagens').delete().eq('campaign_id', id);
-        await supabase.from('sessions').delete().eq('campaign_id', id);
-        const { error } = await supabase.from('campaigns').delete().eq('id', id);
-        if (error) throw error;
+        // Backend handles cascade delete because PRAGMA foreign_keys = ON!
+        const response = await fetch(`/api/campaigns/${id}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete campaign');
+        
         this.campaigns = this.campaigns.filter(c => c.id !== id);
         if (this.activeCampaign && this.activeCampaign.id === id) {
           this.setActiveCampaign(this.campaigns.length > 0 ? this.campaigns[0] : null);

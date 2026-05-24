@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { supabase } from '../services/supabase';
 
 export const usePericiasStore = defineStore('pericias', () => {
   const pericias = ref([]);
@@ -11,11 +10,9 @@ export const usePericiasStore = defineStore('pericias', () => {
     loading.value = true;
     error.value = null;
     try {
-      const { data, error: supabaseError } = await supabase
-        .from('pericias')
-        .select('id, name');
-      if (supabaseError) throw supabaseError;
-      pericias.value = data;
+      const response = await fetch('/api/rules/pericias');
+      if (!response.ok) throw new Error('Failed to fetch pericias');
+      pericias.value = await response.json();
     } catch (err) {
       error.value = err;
       console.error('Erro ao carregar perícias:', err);

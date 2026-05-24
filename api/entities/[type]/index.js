@@ -1,0 +1,73 @@
+import { db } from '../../../utils/db.js';
+import { getUserFromReq } from '../../../utils/auth.js';
+import { v4 as uuidv4 } from 'uuid';
+
+export default async function handler(req, res) {
+    const user = await getUserFromReq(req);
+    if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { type, campaign_id } = req.query;
+
+    const allowedTypes = ['personagens', 'npcs', 'monstros'];
+    if (!allowedTypes.includes(type)) {
+        return res.status(400).json({ error: 'Invalid entity type' });
+    }
+
+    if (req.method === 'GET') {
+        try {
+            let sql = `SELECT * FROM ${type} WHERE user_id = ?`;
+            let args = [user.userId];
+            
+            if (campaign_id) {
+                sql += ' AND (campaign_id = ? OR campaign_id IS NULL)';
+                args.push(campaign_id);
+            }
+
+            const { rows } = await db.execute({ sql, args });
+
+            // Fetch relations
+            for (let entity of rows) {
+                entity.vantagens = (await db.execute(`SELECT vantagem_id as id FROM ${type}_vantagens WHERE ${type.slice(0, -1)}_id = '${entity.id}'`)).rows.map(r => ({ id: r.id }));
+                entity.desvantagens = (await db.execute(`SELECT desvantagem_id as id FROM ${type}_desvantagens WHERE ${type.slice(0, -1)}_id = '${entity.id}'`)).rows.map(r => ({ id: r.id }));
+                entity.pericias = (await db.execute(`SELECT pericia_id as id FROM ${type}_pericias WHERE ${type.slice(0, -1)}_id = '${entity.id}'`)).rows.map(r => ({ id: r.id }));
+                entity.tecnicas = (await db.execute(`SELECT tecnica_id as id FROM ${type}_tecnicas WHERE ${type.slice(0, -1)}_id = '${entity.id}'`)).rows.map(r => ({ id: r.id }));
+            }
+
+            return res.status(200).json(rows);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    if (req.method === 'POST') {
+        try {
+            const data = req.body;
+            const id = uuidv4();
+            
+            const stmts = [];
+            stmts.push({
+                sql: `INSERT INTO ${type} (id, name, archetype, concept, pontos, Habilidade, Poder, Resistencia, Pontos_Vida, Pontos_Acao, Pontos_Mana, image, campaign_id, user_id) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                args: [id, data.name, data.archetype, data.concept, data.pontos, data.Habilidade, data.Poder, data.Resistencia, data.Pontos_Vida, data.Pontos_Acao, data.Pontos_Mana, data.image, data.campaign_id || null, user.userId]
+            });
+
+            const singular = type.slice(0, -1);
+            if (data.vantagens) data.vantagens.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_vantagens (${singular}_id, vantagem_id) VALUES (?, ?)`, args: [id, v.id || v] }));
+            if (data.desvantagens) data.desvantagens.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_desvantagens (${singular}_id, desvantagem_id) VALUES (?, ?)`, args: [id, v.id || v] }));
+            if (data.pericias) data.pericias.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_pericias (${singular}_id, pericia_id) VALUES (?, ?)`, args: [id, v.id || v] }));
+            if (data.tecnicas) data.tecnicas.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_tecnicas (${singular}_id, tecnica_id) VALUES (?, ?)`, args: [id, v.id || v] }));
+
+            await db.batch(stmts, 'write');
+            
+            return res.status(201).json({ id, ...data });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+}

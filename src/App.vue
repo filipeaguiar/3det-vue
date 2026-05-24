@@ -69,7 +69,6 @@ import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from './stores/auth';
 import { useCampaignsStore } from './stores/campaigns';
-import { supabase } from './services/supabase';
 import { storeToRefs } from 'pinia';
 
 const route = useRoute();
@@ -89,12 +88,6 @@ onMounted(async () => {
   if (authStore.user) {
     await campaignsStore.fetchCampaigns(authStore.user.id);
   }
-  supabase.auth.onAuthStateChange(async (_, session) => {
-    authStore.setSession(session);
-    if (session?.user) {
-      await campaignsStore.fetchCampaigns(session.user.id);
-    }
-  });
 });
 </script>
 
