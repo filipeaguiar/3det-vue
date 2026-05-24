@@ -1,7 +1,7 @@
 <template>
   <div class="font-sans antialiased bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-300 min-h-screen">
-    <div class="container relative mx-auto p-4 sm:p-6 md:p-8">
-      <header class="relative text-center mb-8 border-b-4 border-amber-500 pb-4">
+    <div :class="[route.path === '/auth' ? 'w-full h-full' : 'container relative mx-auto p-4 sm:p-6 md:p-8']">
+      <header v-if="route.path !== '/auth'" class="relative text-center mb-8 border-b-4 border-amber-500 pb-4">
         <h1 class="text-3xl sm:text-4xl font-bold tracking-wider text-slate-800 dark:text-slate-100" style="font-family: 'Bangers', cursive;">Escudo do Mestre Digital</h1>
         <p class="text-lg text-slate-600 dark:text-slate-300 uppercase tracking-widest mt-1">3DeT Victory</p>
         <div class="absolute top-0 right-0 mt-2 mr-2">
@@ -14,7 +14,7 @@
         </div>
       </header>
 
-      <nav class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-8">
+      <nav v-if="route.path !== '/auth'" class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-8">
         <router-link to="/" class="flex items-center justify-center gap-x-2 px-4 py-2 rounded-lg shadow-sm transition-all duration-300 ease-in-out" :class="isActive('/') ? 'bg-amber-500 text-white font-semibold dark:text-white' : 'bg-white text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-amber-500 hover:text-white dark:hover:text-slate-800'">
           <font-awesome-icon :icon="['fas', 'dice-d6']" />
           <span class="hidden sm:inline">Testes</span>
