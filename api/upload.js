@@ -1,5 +1,5 @@
 import { put } from '@vercel/blob';
-import { getUserFromReq } from './utils/auth.js';
+import { getUserFromReq } from './_utils/auth.js';
 
 export const config = {
   api: {

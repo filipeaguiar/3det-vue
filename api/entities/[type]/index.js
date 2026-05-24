@@ -1,5 +1,5 @@
-import { db } from '../../../_utils/db.js';
-import { getUserFromReq } from '../../../_utils/auth.js';
+import { db } from '../../_utils/db.js';
+import { getUserFromReq } from '../../_utils/auth.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export default async function handler(req, res) {
@@ -30,10 +30,25 @@ export default async function handler(req, res) {
             // Fetch relations
             const singular = type === 'personagens' ? 'personagem' : type.slice(0, -1);
             for (let entity of rows) {
-                const vantagens = (await db.execute(`SELECT j.vantagem_id as id, r.name, r.cost, r.description FROM ${type}_vantagens j JOIN vantagens r ON j.vantagem_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
-                const desvantagens = (await db.execute(`SELECT j.desvantagem_id as id, r.name, r.cost, r.description FROM ${type}_desvantagens j JOIN desvantagens r ON j.desvantagem_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
-                const pericias = (await db.execute(`SELECT j.pericia_id as id, r.name, r.description FROM ${type}_pericias j JOIN pericias r ON j.pericia_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
-                const tecnicas = (await db.execute(`SELECT j.tecnica_id as id, r.name, r.cost, r.description, r.duration, r.requirements FROM ${type}_tecnicas j JOIN tecnicas r ON j.tecnica_id = r.id WHERE j.${singular}_id = '${entity.id}'`)).rows;
+                const vantagens = (await db.execute({
+                    sql: `SELECT j.vantagem_id as id, r.name, r.cost, r.description FROM ${type}_vantagens j JOIN vantagens r ON j.vantagem_id = r.id WHERE j.${singular}_id = ?`,
+                    args: [entity.id]
+                })).rows;
+                
+                const desvantagens = (await db.execute({
+                    sql: `SELECT j.desvantagem_id as id, r.name, r.cost, r.description FROM ${type}_desvantagens j JOIN desvantagens r ON j.desvantagem_id = r.id WHERE j.${singular}_id = ?`,
+                    args: [entity.id]
+                })).rows;
+                
+                const pericias = (await db.execute({
+                    sql: `SELECT j.pericia_id as id, r.name, r.description FROM ${type}_pericias j JOIN pericias r ON j.pericia_id = r.id WHERE j.${singular}_id = ?`,
+                    args: [entity.id]
+                })).rows;
+                
+                const tecnicas = (await db.execute({
+                    sql: `SELECT j.tecnica_id as id, r.name, r.cost, r.description, r.duration, r.requirements FROM ${type}_tecnicas j JOIN tecnicas r ON j.tecnica_id = r.id WHERE j.${singular}_id = ?`,
+                    args: [entity.id]
+                })).rows;
 
                 // Set clean properties
                 entity.vantagens = vantagens;
