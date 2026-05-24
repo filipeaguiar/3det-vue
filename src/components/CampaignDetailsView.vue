@@ -1,9 +1,20 @@
 <template>
   <div class="p-4 bg-white dark:bg-slate-800 rounded-lg shadow-md h-full flex flex-col">
-    <div v-if="campaign">
-      <h3 class="text-2xl font-bold text-amber-700 dark:text-amber-500 mb-2">{{ campaign.name }}</h3>
+    <div v-if="campaign" class="flex-grow flex flex-col h-full">
+      <div class="flex justify-between items-start mb-2 gap-x-4">
+        <div>
+          <h3 class="text-2xl font-bold text-amber-700 dark:text-amber-500">{{ campaign.name }}</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Criada em: {{ formatDate(campaign.created_at) }}</p>
+        </div>
+        <button 
+          @click="$emit('startEditing')" 
+          class="px-4 py-2 text-sm font-semibold rounded-xl text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-950/70 border border-amber-200/50 dark:border-amber-900/30 transition-all duration-300 flex items-center gap-x-2 focus:outline-none focus:ring-4 focus:ring-amber-500/10 shadow-sm whitespace-nowrap"
+        >
+          <font-awesome-icon :icon="['fas', 'pen-to-square']" />
+          <span>Editar Campanha</span>
+        </button>
+      </div>
       <p class="text-md text-slate-600 dark:text-slate-400 italic mb-4">{{ campaign.description || 'Nenhuma descrição.' }}</p>
-      <p class="text-sm text-slate-600 dark:text-slate-400">Criada em: {{ formatDate(campaign.created_at) }}</p>
 
       <div class="mt-6 flex-grow flex flex-col">
         <h4 class="font-bold text-lg text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-300 dark:border-slate-600 pb-2">Diário da Campanha</h4>

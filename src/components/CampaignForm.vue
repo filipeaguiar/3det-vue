@@ -1,23 +1,48 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-      <h2 class="text-2xl font-bold mb-4 text-amber-500">{{ isEditing ? 'Editar Campanha' : 'Nova Campanha' }}</h2>
+  <div class="fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
+    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-8 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto transition-transform duration-300 transform scale-100">
+      <h2 class="text-2xl font-bold mb-6 text-amber-600 dark:text-amber-500 flex items-center gap-x-2">
+        <font-awesome-icon :icon="['fas', 'book-open']" class="text-amber-500" />
+        <span>{{ isEditing ? 'Editar Campanha' : 'Nova Campanha' }}</span>
+      </h2>
+      
       <form @submit.prevent="handleSubmit">
-        <div class="mb-4">
-          <label for="name" class="block text-gray-300 text-sm font-bold mb-2">Nome da Campanha:</label>
-          <input type="text" id="name" v-model="form.name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white" required>
-          <p v-if="validationErrors.name" class="text-red-500 text-xs italic mt-1">{{ validationErrors.name }}</p>
+        <div class="mb-5">
+          <label for="name" class="block text-slate-700 dark:text-slate-300 text-sm font-semibold mb-2">Nome da Campanha:</label>
+          <input 
+            type="text" 
+            id="name" 
+            v-model="form.name" 
+            class="w-full py-2.5 px-3.5 text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl leading-tight transition-all duration-300 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 placeholder-slate-400 dark:placeholder-slate-500"
+            placeholder="Ex: As Crônicas de Arton"
+            required
+          >
+          <p v-if="validationErrors.name" class="text-red-500 text-xs italic mt-1.5">{{ validationErrors.name }}</p>
         </div>
+        
         <div class="mb-6">
-          <label for="description" class="block text-gray-300 text-sm font-bold mb-2">Descrição:</label>
-          <textarea id="description" v-model="form.description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white" rows="4"></textarea>
+          <label for="description" class="block text-slate-700 dark:text-slate-300 text-sm font-semibold mb-2">Descrição:</label>
+          <textarea 
+            id="description" 
+            v-model="form.description" 
+            class="w-full py-2.5 px-3.5 text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-600 rounded-xl leading-tight transition-all duration-300 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 placeholder-slate-400 dark:placeholder-slate-500" 
+            rows="4"
+            placeholder="Breve resumo da história, sistema ou tom da campanha..."
+          ></textarea>
         </div>
 
-        <div class="flex justify-end gap-4 mt-6">
-          <button type="button" @click="$emit('close')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        <div class="flex justify-end gap-3 mt-6">
+          <button 
+            type="button" 
+            @click="$emit('close')" 
+            class="px-5 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 font-bold transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-4 focus:ring-slate-500/15"
+          >
             Cancelar
           </button>
-          <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          <button 
+            type="submit" 
+            class="px-5 py-2.5 rounded-xl text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-md hover:shadow-lg font-bold transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-4 focus:ring-amber-500/20"
+          >
             {{ isEditing ? 'Salvar Alterações' : 'Criar Campanha' }}
           </button>
         </div>

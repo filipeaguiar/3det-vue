@@ -8,8 +8,8 @@
         class="h-full overflow-y-auto" />
 
       <div class="md:col-span-2 h-full">
-        <CampaignDetailsView v-if="selectedCampaign && !isEditMode" :campaign="selectedCampaign"
-          @startEditing="editCampaign(selectedCampaign)" class="h-full" />
+        <CampaignDetailsView v-if="!isEditMode" :campaign="selectedCampaign"
+          @startEditing="editCampaign" class="h-full" />
         <CampaignForm v-else :campaign="campaignToEdit" @save="handleSaveCampaign" @close="handleCloseForm"
           class="h-full" />
       </div>
