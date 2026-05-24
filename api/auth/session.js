@@ -1,5 +1,5 @@
-import { getUserFromReq } from '../utils/auth.js';
-import { db } from '../utils/db.js';
+import { getUserFromReq } from '../_utils/auth.js';
+import { db } from '../_utils/db.js';
 
 export default async function handler(req, res) {
     if (req.method === 'DELETE') {

@@ -1,6 +1,6 @@
-import { db } from '../utils/db.js';
+import { db } from '../_utils/db.js';
 import bcrypt from 'bcryptjs';
-import { createToken } from '../utils/auth.js';
+import { createToken } from '../_utils/auth.js';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
