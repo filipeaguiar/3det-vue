@@ -39,7 +39,7 @@ export const useSessionsStore = defineStore('sessions', {
         await this.fetchSessions(campaignId);
         if (this.sessions.length > 0) {
           const latestId = this.sessions[0].id;
-          const response = await fetch(`/api/sessions/${latestId}`);
+          const response = await fetch(`/api/sessions?id=${latestId}`);
           if (!response.ok) {
               if(response.status === 404) {
                  this.activeSession = null;
@@ -80,7 +80,7 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/sessions/${sessionData.id}`, {
+        const response = await fetch(`/api/sessions?id=${sessionData.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(sessionData)
@@ -98,7 +98,7 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/sessions/${id}`, {
+        const response = await fetch(`/api/sessions?id=${id}`, {
             method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete session');
