@@ -2,13 +2,11 @@ import { google } from '@ai-sdk/google';
 import { streamObject, generateObject } from 'ai';
 import { z } from 'zod';
 import { db } from './_utils/db-edge.js';
-import { jwtVerify } from 'jose';
+import { verifyToken } from './_utils/auth.js';
 
 export const config = {
   runtime: 'edge',
 };
-
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 // Esquema para a Sessão
 const sessionSchema = z.object({
@@ -68,7 +66,7 @@ export default async function handler(req) {
     const token = req.headers.get('cookie')?.split('; ').find(c => c.startsWith('auth_token='))?.split('=')[1];
     if (!token) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
 
-    const user = await jwtVerify(token, JWT_SECRET).then(v => v.payload).catch(() => null);
+    const user = await verifyToken(token);
     if (!user) return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401 });
 
     // --- AÇÃO: GENERATE SESSION ---
