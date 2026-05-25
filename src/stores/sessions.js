@@ -30,6 +30,26 @@ export const useSessionsStore = defineStore('sessions', {
         this.loading = false;
       }
     },
+    async fetchSessionDetails(sessionId) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await fetch(`/api/sessions?id=${sessionId}`);
+        if (!response.ok) {
+            if(response.status === 404) {
+                this.activeSession = null;
+                return;
+            }
+            throw new Error('Failed to fetch session details');
+        }
+        this.activeSession = await response.json();
+      } catch (err) {
+        this.error = err.message;
+        console.error('Erro ao buscar detalhes da sessão:', err);
+      } finally {
+        this.loading = false;
+      }
+    },
     async fetchLatestSessionWithDetails(campaignId) {
       this.loading = true;
       this.error = null;
