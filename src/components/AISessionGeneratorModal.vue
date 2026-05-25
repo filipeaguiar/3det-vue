@@ -171,16 +171,42 @@ const isGenerating = ref(false);
 // Esquema para o useObject (mesmo do backend)
 const sessionSchema = z.object({
   title: z.string(),
-  description: z.string(),
-  comeco_forte: z.string(),
-  objetivos: z.array(z.object({ description: z.string(), completed: z.boolean() })),
-  ganchos_personagens: z.array(z.object({ personagem_name: z.string(), description: z.string() })),
-  locais_interessantes: z.array(z.object({ name: z.string(), description: z.string(), caracteristicas: z.array(z.string()) })),
-  npcs_importantes: z.array(z.object({ name: z.string(), role: z.string(), notes: z.string() })),
-  encontros_desafios: z.array(z.object({ name: z.string(), description: z.string(), mecanica: z.string() })),
-  segredos_rumores: z.array(z.object({ description: z.string(), revealed: z.boolean() })),
-  tesouros_recompensas: z.array(z.object({ description: z.string(), claimed: z.boolean() })),
-  gancho_proxima_aventura: z.string()
+  description: z.string().optional().default(''),
+  comeco_forte: z.string().optional().default(''),
+  gancho_proxima_aventura: z.string().optional().default(''),
+  objetivos: z.array(z.object({
+    description: z.string(),
+    completed: z.boolean().default(false)
+  })).optional().default([]),
+  ganchos_personagens: z.array(z.object({
+    personagem_name: z.string(),
+    description: z.string()
+  })).optional().default([]),
+  locais_interessantes: z.array(z.object({
+    name: z.string(),
+    description: z.string(),
+    caracteristicas: z.array(z.object({
+        description: z.string()
+    })).optional().default([])
+  })).optional().default([]),
+  npcs_importantes: z.array(z.object({
+    name: z.string(),
+    role: z.string().optional().default(''),
+    notes: z.string().optional().default('')
+  })).optional().default([]),
+  encontros_desafios: z.array(z.object({
+    name: z.string(),
+    description: z.string().optional().default(''),
+    mecanica: z.string().optional().default('')
+  })).optional().default([]),
+  segredos_rumores: z.array(z.object({
+    description: z.string(),
+    revealed: z.boolean().default(false)
+  })).optional().default([]),
+  tesouros_recompensas: z.array(z.object({
+    description: z.string(),
+    claimed: z.boolean().default(false)
+  })).optional().default([])
 });
 
 const aiError = ref(null);
