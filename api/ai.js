@@ -110,7 +110,7 @@ ANTAGONISTAS RECORRENTES E SEUS PLANOS:
 ${villainsContext || 'Nenhum vilão recorrente identificado ainda.'}
 
 DIRETIVAS: Ideia: ${userInput}, NPCs: ${selectedNpcs?.map(n => `${n.name} (${n.role})`).join(', ')}, Monstros: ${selectedMonstros?.map(m => `${m.name} (${m.role})`).join(', ')}
-Retorne APENAS o JSON conforme esquema.`;
+CRÍTICO: Retorne APENAS o objeto JSON puro e válido. NÃO USE blocos de código markdown (como \`\`\`json). Não inclua nenhum texto antes ou depois do JSON.`;
 
       const result = await streamObject({
         model: google('gemini-2.5-flash-lite'),
