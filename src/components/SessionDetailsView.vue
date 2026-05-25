@@ -52,7 +52,7 @@
           <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg shadow">
             <h4 class="font-bold mb-2 flex items-center gap-x-2 dark:text-slate-100"><font-awesome-icon
                 :icon="['fas', 'user-tag']" class="text-slate-500" /><span>Ganchos de Personagens</span></h4>
-            <ul v-if="sessionGanchosPersonagens.length">
+            <ul v-if="sessionGanchosPersonagens && sessionGanchosPersonagens.length > 0">
               <li v-for="gancho in sessionGanchosPersonagens" :key="gancho.id"
                 class="text-slate-600 dark:text-slate-400 mb-1">
                 <span class="font-semibold">{{ gancho.personagem_name || 'Geral' }}:</span> {{ gancho.description }}
@@ -65,11 +65,11 @@
           <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg shadow">
             <h4 class="font-bold mb-2 flex items-center gap-x-2 dark:text-slate-100"><font-awesome-icon
                 :icon="['fas', 'map-marker-alt']" class="text-slate-500" /><span>Locais Interessantes</span></h4>
-            <ul v-if="sessionLocaisInteressantes.length">
+            <ul v-if="sessionLocaisInteressantes && sessionLocaisInteressantes.length > 0">
               <li v-for="local in sessionLocaisInteressantes" :key="local.id"
                 class="text-slate-600 dark:text-slate-400 mb-1">
                 <span class="font-semibold">{{ local.name }}</span>
-                <ul v-if="local.caracteristicas && local.caracteristicas.length" class="ml-4 list-disc list-inside">
+                <ul v-if="local.caracteristicas && local.caracteristicas.length > 0" class="ml-4 list-disc list-inside">
                   <li v-for="carac in local.caracteristicas" :key="carac.id">{{ carac.description }}</li>
                 </ul>
               </li>
@@ -81,9 +81,10 @@
           <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg shadow">
             <h4 class="font-bold mb-2 flex items-center gap-x-2 dark:text-slate-100"><font-awesome-icon
                 :icon="['fas', 'user-friends']" class="text-slate-500" /><span>NPCs Importantes</span></h4>
-            <ul v-if="sessionNpcsImportantes.length">
-              <li v-for="npc in sessionNpcsImportantes" :key="npc.id" class="text-slate-600 dark:text-slate-400">{{
-                npc.name }}</li>
+            <ul v-if="sessionNpcsImportantes && sessionNpcsImportantes.length > 0">
+              <li v-for="npc in sessionNpcsImportantes" :key="npc.id" class="text-slate-600 dark:text-slate-400">
+                <span class="font-semibold">{{ npc.name || 'Desconhecido' }}</span> <span v-if="npc.role">({{ npc.role }})</span>: {{ npc.notes }}
+              </li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhum NPC importante.</p>
           </div>
@@ -92,9 +93,10 @@
           <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg shadow">
             <h4 class="font-bold mb-2 flex items-center gap-x-2 dark:text-slate-100"><font-awesome-icon
                 :icon="['fas', 'bullseye']" class="text-slate-500" /><span>Objetivos</span></h4>
-            <ul v-if="sessionObjetivos.length">
+            <ul v-if="sessionObjetivos && sessionObjetivos.length > 0">
               <li v-for="obj in sessionObjetivos" :key="obj.id" class="text-slate-600 dark:text-slate-400">
-                <span class="font-semibold">{{ obj.type }}:</span> {{ obj.description }}
+                <font-awesome-icon :icon="['fas', obj.completed ? 'check-circle' : 'circle']" :class="obj.completed ? 'text-green-500' : 'text-slate-400'" class="mr-2" />
+                {{ obj.description }}
               </li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhum objetivo.</p>
@@ -104,9 +106,11 @@
           <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg shadow">
             <h4 class="font-bold mb-2 flex items-center gap-x-2 dark:text-slate-100"><font-awesome-icon
                 :icon="['fas', 'mask']" class="text-slate-500" /><span>Segredos e Rumores</span></h4>
-            <ul v-if="sessionSegredosRumores.length">
-              <li v-for="sr in sessionSegredosRumores" :key="sr.id" class="text-slate-600 dark:text-slate-400">{{
-                sr.description }}</li>
+            <ul v-if="sessionSegredosRumores && sessionSegredosRumores.length > 0">
+              <li v-for="sr in sessionSegredosRumores" :key="sr.id" class="text-slate-600 dark:text-slate-400">
+                <font-awesome-icon :icon="['fas', sr.revealed ? 'eye' : 'eye-slash']" :class="sr.revealed ? 'text-amber-500' : 'text-slate-400'" class="mr-2" />
+                {{ sr.description }}
+              </li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhum segredo ou rumor.</p>
           </div>
@@ -115,10 +119,10 @@
           <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg shadow">
             <h4 class="font-bold mb-2 flex items-center gap-x-2 dark:text-slate-100"><font-awesome-icon
                 :icon="['fas', 'coins']" class="text-slate-500" /><span>Tesouros e Recompensas</span></h4>
-            <ul v-if="sessionTesourosRecompensas.length">
+            <ul v-if="sessionTesourosRecompensas && sessionTesourosRecompensas.length > 0">
               <li v-for="tr in sessionTesourosRecompensas" :key="tr.id" class="text-slate-600 dark:text-slate-400">
-                <span class="font-semibold">{{ tr.name }}:</span>
-                {{ tr.description_mecanica || 'Sem descrição mecânica.' }}
+                <font-awesome-icon :icon="['fas', tr.claimed ? 'check-circle' : 'circle']" :class="tr.claimed ? 'text-amber-500' : 'text-slate-400'" class="mr-2" />
+                {{ tr.description }}
               </li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhum tesouro ou recompensa.</p>
@@ -128,10 +132,10 @@
           <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-lg shadow">
             <h4 class="font-bold mb-2 flex items-center gap-x-2 dark:text-slate-100"><font-awesome-icon
                 :icon="['fas', 'dragon']" class="text-slate-500" /><span>Encontros e Desafios</span></h4>
-            <ul v-if="sessionEncontrosDesafios.length">
-              <li v-for="ed in sessionEncontrosDesafios" :key="ed.id" class="text-slate-600 dark:text-slate-400">
-                <span class="font-semibold">{{ ed.title }}:</span> {{ ed.description || 'Sem descrição.' }} (Mecânica:
-                {{ ed.mecanica || 'N/A' }})
+            <ul v-if="sessionEncontrosDesafios && sessionEncontrosDesafios.length > 0">
+              <li v-for="ed in sessionEncontrosDesafios" :key="ed.id" class="text-slate-600 dark:text-slate-400 mb-2">
+                <span class="font-semibold block">{{ ed.name }} <span v-if="ed.mecanica" class="text-sm font-normal bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded ml-2">{{ ed.mecanica }}</span></span> 
+                {{ ed.description || 'Sem descrição.' }}
               </li>
             </ul>
             <p v-else class="text-slate-600 dark:text-slate-400">Nenhum encontro ou desafio.</p>
