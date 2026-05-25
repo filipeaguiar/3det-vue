@@ -13,40 +13,42 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 // Esquema para a Sessão
 const sessionSchema = z.object({
   title: z.string().describe('Um título criativo para a sessão'),
-  description: z.string().describe('Resumo geral da trama'),
-  comeco_forte: z.string().describe('Uma cena de abertura impactante para prender os jogadores'),
+  description: z.string().describe('Resumo geral da trama').optional().default(''),
+  comeco_forte: z.string().describe('Uma cena de abertura impactante').optional().default(''),
+  gancho_proxima_aventura: z.string().describe('Uma ponta solta para a próxima sessão').optional().default(''),
   objetivos: z.array(z.object({
-    description: z.string().describe('O que os heróis precisam alcançar'),
+    description: z.string(),
     completed: z.boolean().default(false)
-  })).describe('Lista de 3 a 5 objetivos claros para a sessão'),
+  })).optional().default([]).describe('Lista de objetivos'),
   ganchos_personagens: z.array(z.object({
-    personagem_name: z.string().describe('Nome do personagem'),
-    description: z.string().describe('Por que este herói se importa com esta aventura especificamente')
-  })).describe('Ganchos individuais baseados nas motivações ou desvantagens dos heróis'),
+    personagem_name: z.string(),
+    description: z.string()
+  })).optional().default([]),
   locais_interessantes: z.array(z.object({
-    name: z.string().describe('Nome do local'),
-    description: z.string().describe('Descrição visual evocativa'),
-    caracteristicas: z.array(z.string()).describe('3 aspectos sensoriais ou mecânicos (ex: Cheiro de enxofre, Ruído de engrenagens)')
-  })).describe('Cenários marcantes que serão visitados'),
+    name: z.string(),
+    description: z.string(),
+    caracteristicas: z.array(z.object({
+        description: z.string()
+    })).optional().default([])
+  })).optional().default([]),
   npcs_importantes: z.array(z.object({
-    name: z.string().describe('Nome do NPC'),
-    role: z.string().describe('Papel na trama (Aliado, Antagonista, etc)'),
-    notes: z.string().describe('Personalidade ou segredo')
-  })).describe('Personagens do mestre que terão destaque'),
+    name: z.string(),
+    role: z.string().optional().default(''),
+    notes: z.string().optional().default('')
+  })).optional().default([]),
   encontros_desafios: z.array(z.object({
-    name: z.string().describe('Nome do desafio ou monstro'),
-    description: z.string().describe('Descrição da situação'),
-    mecanica: z.string().describe('Como resolver (Dificuldade de teste, stats simplificados)')
-  })).describe('Conflitos, armadilhas ou combates'),
+    name: z.string(),
+    description: z.string().optional().default(''),
+    mecanica: z.string().optional().default('')
+  })).optional().default([]),
   segredos_rumores: z.array(z.object({
-    description: z.string().describe('Um fato oculto que pode ser descoberto'),
+    description: z.string(),
     revealed: z.boolean().default(false)
-  })).describe('10 segredos ou pistas para os jogadores descobrirem'),
+  })).optional().default([]),
   tesouros_recompensas: z.array(z.object({
-    description: z.string().describe('Item mágico, moedas ou favores'),
+    description: z.string(),
     claimed: z.boolean().default(false)
-  })).describe('Recompensas pelo sucesso'),
-  gancho_proxima_aventura: z.string().describe('Uma ponta solta para a próxima sessão')
+  })).optional().default([])
 });
 
 // Esquema para o Resumo
