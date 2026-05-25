@@ -110,7 +110,21 @@ ANTAGONISTAS RECORRENTES E SEUS PLANOS:
 ${villainsContext || 'Nenhum vilão recorrente identificado ainda.'}
 
 DIRETIVAS: Ideia: ${userInput}, NPCs: ${selectedNpcs?.map(n => `${n.name} (${n.role})`).join(', ')}, Monstros: ${selectedMonstros?.map(m => `${m.name} (${m.role})`).join(', ')}
-CRÍTICO: Retorne APENAS o objeto JSON puro e válido. NÃO USE blocos de código markdown (como \`\`\`json). Não inclua nenhum texto antes ou depois do JSON.`;
+
+CRÍTICO: Retorne APENAS o objeto JSON puro e válido. NÃO USE blocos de código markdown. Siga EXATAMENTE esta estrutura:
+{
+  "title": "",
+  "description": "",
+  "comeco_forte": "",
+  "gancho_proxima_aventura": "",
+  "objetivos": [ { "description": "", "completed": false } ],
+  "ganchos_personagens": [ { "personagem_name": "", "description": "" } ],
+  "locais_interessantes": [ { "name": "", "description": "", "caracteristicas": [ { "description": "" } ] } ],
+  "npcs_importantes": [ { "name": "", "role": "", "notes": "" } ],
+  "encontros_desafios": [ { "name": "", "description": "", "mecanica": "" } ],
+  "segredos_rumores": [ { "description": "", "revealed": false } ],
+  "tesouros_recompensas": [ { "description": "", "claimed": false } ]
+}`;
 
       const result = await streamObject({
         model: google('gemini-2.5-flash-lite'),
