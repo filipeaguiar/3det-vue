@@ -44,7 +44,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
           const aiRes = await fetch('/api/ai?action=summarize-chapter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: chapter.content })
+            body: JSON.stringify({ content: chapter.content, campaignId })
           });
           if (aiRes.ok) {
             const aiData = await aiRes.json();
@@ -84,7 +84,7 @@ export const useCampaignChaptersStore = defineStore('campaignChapters', {
           const aiRes = await fetch('/api/ai?action=summarize-chapter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: chapter.content })
+            body: JSON.stringify({ content: chapter.content, campaignId })
           });
           if (aiRes.ok) {
             const aiData = await aiRes.json();

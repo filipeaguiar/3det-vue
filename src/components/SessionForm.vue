@@ -148,6 +148,14 @@ watch(() => props.session, (newSession) => {
       });
     }
 
+    // Mapeia o nome do Personagem para o ID correto nos ganchos
+    if(sessionData.ganchos_personagens) {
+      sessionData.ganchos_personagens = sessionData.ganchos_personagens.map(g => {
+        const charMatch = personagensStore.personagens.find(char => char.name === g.personagem_name);
+        return { ...g, personagem_id: charMatch ? charMatch.id : null };
+      });
+    }
+
     formData.value = { ...initialFormState(), ...sessionData };
   } else {
     formData.value = initialFormState();

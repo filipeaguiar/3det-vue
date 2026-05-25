@@ -60,10 +60,19 @@ export default async function handler(req, res) {
             const data = req.body;
             const newId = uuidv4();
             const stmts = [];
-            stmts.push({
-                sql: `INSERT INTO ${type} (id, name, archetype, concept, pontos, Habilidade, Poder, Resistencia, Pontos_Vida, Pontos_Acao, Pontos_Mana, image, campaign_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                args: [newId, data.name, data.archetype, data.concept, data.pontos, data.Habilidade, data.Poder, data.Resistencia, data.Pontos_Vida, data.Pontos_Acao, data.Pontos_Mana, data.image, data.campaign_id || null, user.userId]
-            });
+            
+            if (type === 'npcs') {
+                stmts.push({
+                    sql: `INSERT INTO npcs (id, name, archetype, concept, pontos, Habilidade, Poder, Resistencia, Pontos_Vida, Pontos_Acao, Pontos_Mana, image, campaign_id, user_id, is_villain, villain_motives) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    args: [newId, data.name, data.archetype, data.concept, data.pontos, data.Habilidade, data.Poder, data.Resistencia, data.Pontos_Vida, data.Pontos_Acao, data.Pontos_Mana, data.image, data.campaign_id || null, user.userId, data.is_villain ? 1 : 0, data.villain_motives || null]
+                });
+            } else {
+                stmts.push({
+                    sql: `INSERT INTO ${type} (id, name, archetype, concept, pontos, Habilidade, Poder, Resistencia, Pontos_Vida, Pontos_Acao, Pontos_Mana, image, campaign_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    args: [newId, data.name, data.archetype, data.concept, data.pontos, data.Habilidade, data.Poder, data.Resistencia, data.Pontos_Vida, data.Pontos_Acao, data.Pontos_Mana, data.image, data.campaign_id || null, user.userId]
+                });
+            }
+
             const singular = type === 'personagens' ? 'personagem' : type.slice(0, -1);
             if (data.vantagens) data.vantagens.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_vantagens (${singular}_id, vantagem_id) VALUES (?, ?)`, args: [newId, v.id || v] }));
             if (data.desvantagens) data.desvantagens.forEach(v => stmts.push({ sql: `INSERT INTO ${type}_desvantagens (${singular}_id, desvantagem_id) VALUES (?, ?)`, args: [newId, v.id || v] }));
@@ -102,10 +111,18 @@ export default async function handler(req, res) {
                 const data = req.body;
                 const singular = type === 'personagens' ? 'personagem' : type.slice(0, -1);
                 const stmts = [];
-                stmts.push({
-                    sql: `UPDATE ${type} SET name=?, archetype=?, concept=?, pontos=?, Habilidade=?, Poder=?, Resistencia=?, Pontos_Vida=?, Pontos_Acao=?, Pontos_Mana=?, image=?, campaign_id=? WHERE id=?`,
-                    args: [data.name, data.archetype, data.concept, data.pontos, data.Habilidade, data.Poder, data.Resistencia, data.Pontos_Vida, data.Pontos_Acao, data.Pontos_Mana, data.image, data.campaign_id || null, id]
-                });
+                
+                if (type === 'npcs') {
+                    stmts.push({
+                        sql: `UPDATE npcs SET name=?, archetype=?, concept=?, pontos=?, Habilidade=?, Poder=?, Resistencia=?, Pontos_Vida=?, Pontos_Acao=?, Pontos_Mana=?, image=?, campaign_id=?, is_villain=?, villain_motives=? WHERE id=?`,
+                        args: [data.name, data.archetype, data.concept, data.pontos, data.Habilidade, data.Poder, data.Resistencia, data.Pontos_Vida, data.Pontos_Acao, data.Pontos_Mana, data.image, data.campaign_id || null, data.is_villain ? 1 : 0, data.villain_motives || null, id]
+                    });
+                } else {
+                    stmts.push({
+                        sql: `UPDATE ${type} SET name=?, archetype=?, concept=?, pontos=?, Habilidade=?, Poder=?, Resistencia=?, Pontos_Vida=?, Pontos_Acao=?, Pontos_Mana=?, image=?, campaign_id=? WHERE id=?`,
+                        args: [data.name, data.archetype, data.concept, data.pontos, data.Habilidade, data.Poder, data.Resistencia, data.Pontos_Vida, data.Pontos_Acao, data.Pontos_Mana, data.image, data.campaign_id || null, id]
+                    });
+                }
                 stmts.push({ sql: `DELETE FROM ${type}_vantagens WHERE ${singular}_id = ?`, args: [id] });
                 stmts.push({ sql: `DELETE FROM ${type}_desvantagens WHERE ${singular}_id = ?`, args: [id] });
                 stmts.push({ sql: `DELETE FROM ${type}_pericias WHERE ${singular}_id = ?`, args: [id] });

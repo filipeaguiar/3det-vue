@@ -262,6 +262,35 @@
         </button>
       </div>
 
+      <!-- Villain Status (NPC only) -->
+      <div v-if="entityType === 'npc'" class="mt-6 p-4 border rounded-lg shadow-sm bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30">
+        <h3 class="text-lg font-bold mb-3 text-red-800 dark:text-red-400 flex items-center gap-x-2">
+          <font-awesome-icon :icon="['fas', 'skull-crossbones']" />
+          <span>Status de Antagonista</span>
+        </h3>
+        <div class="flex items-center mb-4">
+          <input
+            type="checkbox"
+            id="is_villain"
+            v-model="formData.is_villain"
+            class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+          />
+          <label for="is_villain" class="ml-2 block text-sm font-bold text-gray-700 dark:text-gray-300 cursor-pointer">
+            Este NPC é um Vilão Recorrente?
+          </label>
+        </div>
+        <div v-if="formData.is_villain" class="transition-all duration-300">
+          <label for="villain_motives" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Planos e Motivações:</label>
+          <textarea
+            id="villain_motives"
+            v-model="formData.villain_motives"
+            rows="3"
+            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white"
+            placeholder="O que ele quer alcançar? Quais seus planos maléficos?"
+          ></textarea>
+        </div>
+      </div>
+
       <div class="flex justify-end space-x-2 mt-6">
         <button
           type="button"
@@ -331,6 +360,8 @@ const formData = ref({
   Pontos_Mana: null,
   Pontos_Vida: null,
   image: '', // Changed from image_url to image
+  is_villain: false,
+  villain_motives: '',
   pericias: [],
   vantagens: [],
   desvantagens: [],
@@ -376,6 +407,8 @@ watch(() => props.entity, (newEntity) => {
 
     formData.value = {
       ...newEntity,
+      is_villain: newEntity.is_villain === 1 || newEntity.is_villain === true,
+      villain_motives: newEntity.villain_motives || '',
       pericias: pericias,
       vantagens: vantagens,
       desvantagens: desvantagens,
@@ -395,6 +428,8 @@ watch(() => props.entity, (newEntity) => {
       Pontos_Mana: null,
       Pontos_Vida: null,
       image: '',
+      is_villain: false,
+      villain_motives: '',
       pericias: [],
       vantagens: [],
       desvantagens: [],
