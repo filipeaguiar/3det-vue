@@ -176,14 +176,14 @@ const props = defineProps({
 
 const emit = defineEmits(['sessionUpdated', 'creationCancelled', 'startEditing']);
 
-// Simply use computed properties bound to selectedSession since the store provides it deeply populated
-const sessionGanchosPersonagens = computed(() => props.selectedSession?.ganchos_personagens || props.selectedSession?.session_ganchos_personagens || []);
-const sessionLocaisInteressantes = computed(() => props.selectedSession?.locais_interessantes || props.selectedSession?.session_locais_interessantes || []);
-const sessionNpcsImportantes = computed(() => props.selectedSession?.npcs_importantes || props.selectedSession?.session_npcs_importantes || []);
-const sessionObjetivos = computed(() => props.selectedSession?.objetivos || props.selectedSession?.session_objetivos || []);
-const sessionSegredosRumores = computed(() => props.selectedSession?.segredos_rumores || props.selectedSession?.session_segredos_rumores || []);
-const sessionTesourosRecompensas = computed(() => props.selectedSession?.tesouros_recompensas || props.selectedSession?.session_tesouros_recompensas || []);
-const sessionEncontrosDesafios = computed(() => props.selectedSession?.encontros_desafios || props.selectedSession?.session_encontros_desafios || []);
+// Simply use computed properties bound to selectedSession
+const sessionGanchosPersonagens = computed(() => props.selectedSession?.ganchos_personagens || []);
+const sessionLocaisInteressantes = computed(() => props.selectedSession?.locais_interessantes || []);
+const sessionNpcsImportantes = computed(() => props.selectedSession?.npcs_importantes || []);
+const sessionObjetivos = computed(() => props.selectedSession?.objetivos || []);
+const sessionSegredosRumores = computed(() => props.selectedSession?.segredos_rumores || []);
+const sessionTesourosRecompensas = computed(() => props.selectedSession?.tesouros_recompensas || []);
+const sessionEncontrosDesafios = computed(() => props.selectedSession?.encontros_desafios || []);
 
 const saveSession = async (sessionData) => {
   // Let parent (view) handle it through the store
