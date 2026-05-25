@@ -5,7 +5,58 @@
       
       <!-- Campos Principais -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Título e Descrição -->
+        <div class="mb-4 relative">
+          <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Título</label>
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
+            <font-awesome-icon :icon="['fas', 'heading']" class="text-gray-400" />
+          </div>
+          <input
+            type="text"
+            id="title"
+            v-model="formData.title"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white pl-10"
+            required
+          />
+        </div>
+
+        <div class="mb-4 relative">
+          <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição</label>
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
+            <font-awesome-icon :icon="['fas', 'align-left']" class="text-gray-400" />
+          </div>
+          <textarea
+            id="description"
+            v-model="formData.description"
+            rows="3"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white pl-10"
+          ></textarea>
+        </div>
+
+        <div class="mb-4 relative">
+          <label for="comeco_forte" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Começo Forte</label>
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
+            <font-awesome-icon :icon="['fas', 'bolt']" class="text-gray-400" />
+          </div>
+          <textarea
+            id="comeco_forte"
+            v-model="formData.comeco_forte"
+            rows="2"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white pl-10"
+          ></textarea>
+        </div>
+
+        <div class="mb-4 relative">
+          <label for="gancho_proxima_aventura" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gancho Próxima Aventura</label>
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none mt-6">
+            <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-gray-400" />
+          </div>
+          <textarea
+            id="gancho_proxima_aventura"
+            v-model="formData.gancho_proxima_aventura"
+            rows="2"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white pl-10"
+          ></textarea>
+        </div>
       </div>
 
       <!-- Seções Dinâmicas -->
