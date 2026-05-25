@@ -86,6 +86,7 @@ const showAiModal = ref(false);
 const selectSession = async (session) => {
   if (session && session.id) {
     await sessionsStore.fetchSessionDetails(session.id);
+    sessionsStore.activeSession = JSON.parse(JSON.stringify(sessionsStore.activeSession));
   }
   isEditMode.value = false;
 };
@@ -157,10 +158,11 @@ const loadInitialData = async (campaign) => {
   }
   await sessionsStore.fetchSessions(campaign.id);
   await sessionsStore.fetchLatestSessionWithDetails(campaign.id);
-  if (!sessionsStore.activeSession && sessionsStore.sessions.length > 0) {
+  if (sessionsStore.activeSession) {
+    sessionsStore.activeSession = JSON.parse(JSON.stringify(sessionsStore.activeSession));
+  } else if (sessionsStore.sessions.length > 0) {
     sessionsStore.activeSession = sessionsStore.sessions[0];
   }
-  // Removemos o auto-addSession para não atrapalhar o fluxo da IA
 };
 
 watch(activeCampaign, (newCampaign) => {
