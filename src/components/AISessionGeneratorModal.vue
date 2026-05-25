@@ -177,6 +177,7 @@ const { object: partialObject, submit, isLoading } = useObject({
   api: '/api/ai?action=generate-session',
   schema: sessionSchema,
   onFinish: ({ object }) => {
+    console.log("Resposta da IA:", object);
     isGenerating.value = false;
     emit('generated', object);
   }
