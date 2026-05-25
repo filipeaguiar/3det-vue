@@ -180,7 +180,6 @@ const props = defineProps({
 
 const emit = defineEmits(['sessionUpdated', 'creationCancelled', 'startEditing']);
 
-// Simply use computed properties bound to selectedSession
 const sessionGanchosPersonagens = computed(() => props.selectedSession?.ganchos_personagens || []);
 const sessionLocaisInteressantes = computed(() => props.selectedSession?.locais_interessantes || []);
 const sessionNpcsImportantes = computed(() => props.selectedSession?.npcs_importantes || []);

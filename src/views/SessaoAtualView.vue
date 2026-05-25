@@ -84,11 +84,8 @@ const messageType = ref('');
 const showAiModal = ref(false);
 
 const selectSession = async (session) => {
-  // We need to fetch the full details for the selected session
   if (session && session.id) {
     await sessionsStore.fetchSessionDetails(session.id);
-  } else {
-    sessionsStore.activeSession = session;
   }
   isEditMode.value = false;
 };
