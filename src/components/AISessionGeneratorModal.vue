@@ -112,6 +112,16 @@
           </div>
         </div>
 
+        <!-- Error State -->
+        <div v-if="aiError" class="bg-red-50 dark:bg-red-900/20 p-6 rounded-2xl border-2 border-dashed border-red-200 dark:border-red-900/30">
+          <h4 class="font-bold text-red-700 dark:text-red-400 mb-2 flex items-center gap-2">
+            <font-awesome-icon :icon="['fas', 'triangle-exclamation']" />
+            Erro na Geração
+          </h4>
+          <p class="text-sm text-red-600 dark:text-red-300">{{ aiError }}</p>
+          <p class="text-xs text-red-500 mt-2">Verifique o console do navegador para mais detalhes técnicos.</p>
+        </div>
+
       </div>
 
       <!-- Footer -->
@@ -173,13 +183,31 @@ const sessionSchema = z.object({
   gancho_proxima_aventura: z.string()
 });
 
+const aiError = ref(null);
+
 const { object: partialObject, submit, isLoading } = useObject({
   api: '/api/ai?action=generate-session',
   schema: sessionSchema,
-  onFinish: ({ object }) => {
-    console.log("Resposta da IA:", object);
+  onFinish: (event) => {
+    console.log("Evento completo da IA:", event);
     isGenerating.value = false;
-    emit('generated', object);
+    
+    if (event.error) {
+      console.error("Erro reportado pelo AI SDK:", event.error);
+      aiError.value = event.error.message || 'Ocorreu um erro desconhecido durante a geração.';
+      return;
+    }
+    
+    if (event.object) {
+      emit('generated', event.object);
+    } else {
+      aiError.value = 'A resposta da IA veio vazia (undefined).';
+    }
+  },
+  onError: (error) => {
+    console.error("Erro onError do AI SDK:", error);
+    aiError.value = error.message;
+    isGenerating.value = false;
   }
 });
 
